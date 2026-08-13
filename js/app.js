@@ -249,16 +249,6 @@ function showTrackChangeBurst(track) {
     });
   }
 
-  // Bottom Toggles Bar
-  const toggleScreensaver = document.getElementById('toggle-screensaver');
-  if (toggleScreensaver) {
-    toggleScreensaver.addEventListener('click', () => {
-      const enabled = screensaver.toggleEnabled();
-      toggleScreensaver.classList.toggle('active', enabled);
-      toggleScreensaver.classList.toggle('off', !enabled);
-    });
-  }
-
   const toggleTriggers = document.getElementById('toggle-triggers');
   if (toggleTriggers) {
     toggleTriggers.addEventListener('click', () => {
@@ -365,11 +355,11 @@ function showTrackChangeBurst(track) {
   // === JS-ТУЛТИПЫ (нижний бар) ===
   // Показываются при hover и долгом нажатии, исчезают через 2с
   const BUTTON_TOOLTIPS = {
-    'toggle-screensaver': 'Скринсейвер',
     'toggle-triggers':    'Надписи / Всплывашки',
     'toggle-mediashow':   'Фото и видео',
     'toggle-speed':       'Скорость медиа',
   };
+
 
   let tooltipEl = null;
   let tooltipHideTimer = null;
@@ -384,14 +374,14 @@ function showTrackChangeBurst(track) {
     tip.textContent = text;
     document.body.appendChild(tip);
 
-    // Позиционирование снизу кнопки
+    // Позиционирование НАД кнопкой
     const rect = btn.getBoundingClientRect();
     const tipW = tip.offsetWidth || 120;
+    const tipH = tip.offsetHeight || 30;
     let left = rect.left + rect.width / 2 - tipW / 2;
-    // Клампинг по горизонтали
     left = Math.max(8, Math.min(window.innerWidth - tipW - 8, left));
     tip.style.left = left + 'px';
-    tip.style.top = (rect.bottom + 8) + 'px';
+    tip.style.top = (rect.top - tipH - 10) + 'px';
 
     // Появление
     requestAnimationFrame(() => tip.classList.add('visible'));
@@ -432,41 +422,143 @@ function showTrackChangeBurst(track) {
     });
   });
 
-  // === КАСТОМНЫЙ КУРСОР (десктоп, lerp-плавность) ===
-  const cursor = document.getElementById('custom-cursor');
-  const isMobileDevice = /Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent)
-    || window.matchMedia('(pointer: coarse)').matches;
+  // === Кнопка ИНФО — легенда ===
+  (function() {
+    const btn = document.getElementById('toggle-info');
+    if (!btn) return;
 
-  if (cursor && !isMobileDevice) {
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let curX = mouseX;
-    let curY = mouseY;
-    let rafId = null;
+    let legend = null;
 
-    document.documentElement.style.cursor = 'none'; // Скрываем стандартный
-    cursor.style.display = 'block';
-
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-
-    // Плавное следование через lerp
-    function animateCursor() {
-      const lerpFactor = 0.18;
-      curX += (mouseX - curX) * lerpFactor;
-      curY += (mouseY - curY) * lerpFactor;
-      cursor.style.left = curX + 'px';
-      cursor.style.top = curY + 'px';
-      rafId = requestAnimationFrame(animateCursor);
+    function createLegend() {
+      const el = document.createElement('div');
+      el.id = 'info-legend';
+      el.innerHTML = `
+        <div class="info-legend-row"><span>💬</span><span>Надписи / Всплывашки — вкл/выкл текстовые триггеры</span></div>
+        <div class="info-legend-row"><span>🖼</span><span>Фото и видео — вкл/выкл медиашоу</span></div>
+        <div class="info-legend-row"><span>⚡</span><span>Скорость медиа — меняет скорость появления (1–5)</span></div>
+      `;
+      el.style.cssText = `
+        position: fixed;
+        z-index: 99999;
+        background: rgba(10, 18, 28, 0.97);
+        border: 1px solid rgba(0, 242, 254, 0.6);
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 12px;
+        color: #E2ECF6;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 16px rgba(0,242,254,0.2);
+        pointer-events: auto;
+        min-width: 220px;
+        max-width: 90vw;
+      `;
+      return el;
     }
-    rafId = requestAnimationFrame(animateCursor);
 
-    // Чистим при выгрузке страницы
-    window.addEventListener('beforeunload', () => cancelAnimationFrame(rafId));
-  } else if (cursor) {
-    cursor.style.display = 'none'; // Мобайльные: не показываем
+    function positionLegend(el) {
+      const bar = document.getElementById('bottom-toggles-bar');
+      const barRect = bar ? bar.getBoundingClientRect() : { top: window.innerHeight - 70, left: window.innerWidth / 2 };
+      const elH = el.offsetHeight || 120;
+      const elW = el.offsetWidth || 240;
+      let top = barRect.top - elH - 14;
+      let left = barRect.left + barRect.width / 2 - elW / 2;
+      top = Math.max(8, top);
+      left = Math.max(8, Math.min(window.innerWidth - elW - 8, left));
+      el.style.top = top + 'px';
+      el.style.left = left + 'px';
+    }
+
+    function showLegend() {
+      if (legend) return;
+      legend = createLegend();
+      document.body.appendChild(legend);
+      requestAnimationFrame(() => positionLegend(legend));
+      btn.classList.add('active');
+
+      // Закрытие по клику вне
+      setTimeout(() => {
+        document.addEventListener('click', outsideClose, { once: true, capture: true });
+      }, 10);
+    }
+
+    function hideLegend() {
+      if (!legend) return;
+      legend.remove();
+      legend = null;
+      btn.classList.remove('active');
+      document.removeEventListener('click', outsideClose, true);
+    }
+
+    function outsideClose(e) {
+      if (legend && !legend.contains(e.target) && e.target !== btn) {
+        hideLegend();
+      } else if (legend) {
+        // Оставляем слушатель если клик внутри
+        setTimeout(() => {
+          document.addEventListener('click', outsideClose, { once: true, capture: true });
+        }, 10);
+      }
+    }
+
+    btn.addEventListener('click', () => {
+      if (legend) hideLegend();
+      else showLegend();
+    });
+  })();
+
+  // === ПАДАЮЩИЕ ЗВЁЗДЫ ===
+  function startShootingStars() {
+    function spawnStar() {
+      const star = document.createElement('div');
+      const goRight = Math.random() > 0.5;
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * window.innerHeight * 0.4; // верхняя 40%
+      const angle = goRight ? (30 + Math.random() * 30) : (150 - Math.random() * 30); // 30-60° или 120-150°
+      const length = 80 + Math.random() * 80;
+      const duration = 900 + Math.random() * 600; // ms
+
+      const rad = angle * Math.PI / 180;
+      const dx = Math.cos(rad) * length * 3;
+      const dy = Math.sin(rad) * length * 3;
+
+      star.style.cssText = `
+        position: fixed;
+        top: ${startY}px;
+        left: ${startX}px;
+        width: ${length}px;
+        height: 2px;
+        background: linear-gradient(${goRight ? '90deg' : '270deg'}, rgba(255,255,255,0), rgba(255,255,255,0.9) 60%, #00F2FE);
+        border-radius: 2px;
+        box-shadow: 0 0 6px 1px rgba(0,242,254,0.6), 0 0 2px 0 #fff;
+        z-index: 50;
+        pointer-events: none;
+        transform: rotate(${angle}deg) scaleX(0);
+        transform-origin: right center;
+        opacity: 0;
+      `;
+      document.body.appendChild(star);
+
+      const keyframes = [
+        { opacity: 0, transform: `rotate(${angle}deg) scaleX(0) translate(0,0)` },
+        { opacity: 1, transform: `rotate(${angle}deg) scaleX(1) translate(0,0)`, offset: 0.2 },
+        { opacity: 0, transform: `rotate(${angle}deg) scaleX(0.3) translate(${dx}px, ${dy}px)` }
+      ];
+      const anim = star.animate(keyframes, { duration, easing: 'ease-in', fill: 'forwards' });
+      anim.onfinish = () => { if (star.parentNode) star.remove(); };
+    }
+
+    function scheduleWave() {
+      const delay = 10000 + Math.random() * 5000; // 10-15 с
+      setTimeout(() => {
+        const count = 1 + Math.floor(Math.random() * 3); // 1-3 звезды
+        for (let i = 0; i < count; i++) {
+          setTimeout(spawnStar, i * (200 + Math.random() * 300));
+        }
+        scheduleWave();
+      }, delay);
+    }
+    scheduleWave();
   }
+  startShootingStars();
 
 });
