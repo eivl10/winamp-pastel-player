@@ -1,49 +1,25 @@
 document.addEventListener('DOMContentLoaded', async () => {
 // === TRACK CHANGE BURST ANIMATION ===
 function showTrackChangeBurst(track) {
-  // 1. Большое центральное попап с названием трека
   const burst = document.createElement('div');
-  burst.className = 'track-burst';
+  burst.className = 'track-burst track-burst-small';
   burst.innerHTML = `
     <div class="track-burst-inner">
-      <div class="track-burst-emoji">🎵</div>
       <div class="track-burst-title">${track ? track.title : ''}</div>
       <div class="track-burst-artist">${track ? track.artist : ''}</div>
     </div>
   `;
   document.body.appendChild(burst);
   
-  // 2. Удар света (вспышка)
   const flash = document.createElement('div');
-  flash.className = 'track-burst-flash';
+  flash.className = 'track-burst-flash track-burst-flash-small';
   document.body.appendChild(flash);
   
-  // 3. Дождь эмоджи вокруг названия
-  const emojiSet = ['🌹', '✨', '💃', '🎺', '🔥', '🌟', '💫', '⭐', '🦀', '🌈'];
-  for (let i = 0; i < 18; i++) {
-    setTimeout(() => {
-      const em = document.createElement('span');
-      em.textContent = emojiSet[Math.floor(Math.random() * emojiSet.length)];
-      em.style.cssText = `
-        position: fixed;
-        font-size: ${20 + Math.random() * 30}px;
-        left: ${Math.random() * 90 + 5}vw;
-        top: -40px;
-        z-index: 9000;
-        pointer-events: none;
-        animation: trigger-confetti-fall ${1.2 + Math.random() * 1.8}s ease-in forwards;
-      `;
-      document.body.appendChild(em);
-      setTimeout(() => em.remove(), 4000);
-    }, i * 60);
-  }
-  
-  // 4. Автоудаление
   setTimeout(() => {
     burst.classList.add('hiding');
-    flash.remove();
-    setTimeout(() => burst.remove(), 600);
-  }, 2200);
+    if(flash.parentNode) flash.remove();
+    setTimeout(() => { if(burst.parentNode) burst.remove(); }, 300);
+  }, 1100);
 }
 
   // 1. Load tracks.js
@@ -366,4 +342,23 @@ function showTrackChangeBurst(track) {
   } else {
     startApp();
   }
+
+  // === LIGHTNING ANIMATION ===
+  function scheduleLightning() {
+    const min = 2 * 60 * 1000;
+    const max = 5 * 60 * 1000;
+    const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+    
+    setTimeout(() => {
+      const flash = document.createElement('div');
+      flash.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 99999; pointer-events: none; animation: lightning-flash 2s ease-out forwards;';
+      document.body.appendChild(flash);
+      setTimeout(() => {
+        if(flash.parentNode) flash.remove();
+        scheduleLightning();
+      }, 2000);
+    }, delay);
+  }
+  scheduleLightning();
+
 });

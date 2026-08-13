@@ -614,3 +614,19 @@
   justify-content: center;
 }
 
+.overlay-popup-small {
+  transform: scale(0.6) !important;
+}
+
+.track-burst-small {
+  transform: translate(-50%, -50%) scale(0.6) !important;
+}
+
+@keyframes lightning-flash {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  15% { opacity: 0; }
+  25% { opacity: 1; }
+  35% { opacity: 0; }
+  100% { opacity: 0; }
+}

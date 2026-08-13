@@ -77,8 +77,9 @@ class TriggerEngine {
       el.addEventListener('click', () => el.remove());
     } else if (trigger.type === 'popup') {
       el = document.createElement('div');
-      el.className = 'overlay-popup';
-      el.innerHTML = trigger.content || '';
+      el.className = 'overlay-popup overlay-popup-small';
+      const cleanText = (trigger.content || '').replace(/[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/gu, '').trim();
+      el.innerHTML = cleanText;
       const colors = ['var(--cyan)', 'var(--mint)', 'var(--lavender-deep)', 'var(--butter)'];
       el.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
     } else {
@@ -94,7 +95,9 @@ class TriggerEngine {
         document.body.appendChild(el);
     }
     
-    this._scheduleRemoval(el, (trigger.duration || 4) * 1000);
+    // Попапы убираем в 2 раза быстрее, как просил пользователь
+    const durationMult = trigger.type === 'popup' ? 500 : 1000;
+    this._scheduleRemoval(el, (trigger.duration || 4) * durationMult);
   }
 
   _applyEffect(el, effect) {
