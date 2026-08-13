@@ -27,28 +27,37 @@
   justify-content: space-between;
 }
 
-.winamp-titlebar .title {
+.winamp-titlebar .title,
+.winamp-title {
   font-family: 'Share Tech Mono', monospace;
   color: var(--butter);
   letter-spacing: 4px;
   font-size: 11px;
   text-shadow: 0 0 10px var(--glow-butter);
-  animation: flicker 2.5s infinite;
 }
 
-.winamp-titlebar .buttons {
+.winamp-titlebar .buttons,
+.winamp-titlebar-buttons {
   display: flex;
   gap: 6px;
+  align-items: center;
 }
 
 .winamp-titlebar .btn-min,
-.winamp-titlebar .btn-close {
+.winamp-titlebar .btn-close,
+.winamp-btn-minimize,
+.winamp-btn-close {
   width: 12px;
   height: 12px;
+  min-width: 12px;
+  min-height: 12px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid var(--lavender-deep);
+  background: rgba(255,255,255,0.3);
+  border: 1px solid rgba(255,255,255,0.6);
   cursor: pointer;
+  padding: 0;
+  margin: 0;
+  display: inline-block;
 }
 
 .winamp-display {
@@ -140,7 +149,10 @@
   cursor: pointer;
 }
 
-.seek-container, .volume-container {
+.seek-container,
+.volume-container,
+.winamp-seek-container,
+.winamp-volume-container {
   padding: 6px 12px;
 }
 

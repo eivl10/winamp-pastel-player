@@ -61,18 +61,6 @@
   },
   {
     "id": "track-06",
-    "title": "Куда уходит детство",
-    "artist": "Алла Пугачёва",
-    "url": "PLACEHOLDER",
-    "triggers": [
-      { "time": 5, "type": "popup", "content": "🧸 Ностальгия в глаз попала...", "effect": "float-up", "position": "top-left", "duration": 4 },
-      { "time": 35, "type": "image", "src": "assets/images/фрукты.jpg", "effect": "zoom-burst", "position": "bottom-right", "duration": 5 },
-      { "time": 65, "type": "emoji-shower", "emojis": ["🎠", "🎈", "👶"], "duration": 4 },
-      { "time": 100, "type": "video", "src": "assets/videos/круг 3.mp4", "effect": "glitch", "position": "center", "duration": 9 }
-    ]
-  },
-  {
-    "id": "track-07",
     "title": "Любовь одна виновата",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugachyova_-_Lyubov_odna_vinovata_(SkySound7.com).mp3",
@@ -84,7 +72,7 @@
     ]
   },
   {
-    "id": "track-08",
+    "id": "track-07",
     "title": "Мне нравится",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Ala_Pugacheva_-_mne_nravitsya_(SkySound7.com).mp3",
@@ -96,7 +84,7 @@
     ]
   },
   {
-    "id": "track-09",
+    "id": "track-08",
     "title": "Посреди зимы",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugacheva_-_Posredi_zimy_1975._Studijnaya_zapis_(SkySound7.com).mp3",
@@ -108,7 +96,7 @@
     ]
   },
   {
-    "id": "track-10",
+    "id": "track-09",
     "title": "Люди, люди",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugacheva_-_7._Lyudi_lyudi_A._Pugacheva_-_I._Reznik__(SkySound7.com).mp3",
@@ -120,7 +108,7 @@
     ]
   },
   {
-    "id": "track-11",
+    "id": "track-10",
     "title": "Усталость",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugachyova_-_Ustalost_1982_(SkySound7.com).mp3",
@@ -132,7 +120,7 @@
     ]
   },
   {
-    "id": "track-12",
+    "id": "track-11",
     "title": "Я больше не ревную",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/1981_Alla_Pugacheva_-_YA_bolshe_ne_revnuyu_(SkySound7.com).mp3",
@@ -144,31 +132,7 @@
     ]
   },
   {
-    "id": "track-13",
-    "title": "Как тревожен этот путь",
-    "artist": "Алла Пугачёва",
-    "url": "PLACEHOLDER",
-    "triggers": [
-      { "time": 18, "type": "popup", "content": "🛤️ Путь неблизкий...", "effect": "float-up", "position": "bottom-left", "duration": 5 },
-      { "time": 55, "type": "image", "src": "assets/images/фрукты.jpg", "effect": "zoom-burst", "position": "top-right", "duration": 4 },
-      { "time": 90, "type": "emoji-shower", "emojis": ["🛣️", "🚶‍♀️", "🌠"], "duration": 5 },
-      { "time": 130, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "fade-in", "position": "center", "duration": 10 }
-    ]
-  },
-  {
-    "id": "track-14",
-    "title": "Старинные часы",
-    "artist": "Алла Пугачёва",
-    "url": "PLACEHOLDER",
-    "triggers": [
-      { "time": 9, "type": "popup", "content": "⏰ ВРЕМЯ ИДЕТ!", "effect": "shake", "position": "top-right", "duration": 4 },
-      { "time": 45, "type": "image", "src": "assets/images/хуля.webp", "effect": "spin-in", "position": "center", "duration": 5 },
-      { "time": 75, "type": "emoji-shower", "emojis": ["⏳", "🕰️", "⌛"], "duration": 4 },
-      { "time": 115, "type": "video", "src": "assets/videos/круг2.mp4", "effect": "glitch", "position": "bottom-left", "duration": 7 }
-    ]
-  },
-  {
-    "id": "track-15",
+    "id": "track-12",
     "title": "Миллион роз",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugachyova_-_Million_roz_(SkySound7.com).mp3",
@@ -180,7 +144,7 @@
     ]
   },
   {
-    "id": "track-16",
+    "id": "track-13",
     "title": "Расскажите птицы",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/RASSKAZHITE_PTICY_-_PUGACHYOVA_(SkySound7.com).mp3",
@@ -192,7 +156,7 @@
     ]
   },
   {
-    "id": "track-17",
+    "id": "track-14",
     "title": "Самолёты улетают",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugachyova_-_Samolety_uletayut_(SkySound7.com).mp3",
@@ -204,7 +168,7 @@
     ]
   },
   {
-    "id": "track-18",
+    "id": "track-15",
     "title": "Озеро надежды",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugacheva_-_Ozero_Nadezhdy_(SkySound7.com).mp3",
@@ -216,19 +180,7 @@
     ]
   },
   {
-    "id": "track-19",
-    "title": "Любовь похожая на сон",
-    "artist": "Алла Пугачёва",
-    "url": "PLACEHOLDER",
-    "triggers": [
-      { "time": 15, "type": "popup", "content": "☁️ Это все сон?", "effect": "fade-in", "position": "top-right", "duration": 5 },
-      { "time": 55, "type": "image", "src": "assets/images/ключ.jpg", "effect": "zoom-burst", "position": "center", "duration": 4 },
-      { "time": 85, "type": "emoji-shower", "emojis": ["☁️", "🌙", "✨"], "duration": 5 },
-      { "time": 125, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "glitch", "position": "bottom-right", "duration": 8 }
-    ]
-  },
-  {
-    "id": "track-20",
+    "id": "track-16",
     "title": "Свеча горела на столе",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/7.Alla_Pugacheva_-_Svecha_gorela_na_stole_(SkySound7.com).mp3",
@@ -240,7 +192,7 @@
     ]
   },
   {
-    "id": "track-21",
+    "id": "track-17",
     "title": "Этот мир придуман не мною",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugacheva_-_Etot_mir_priduman_ne_mnoyu_(SkySound7.com).mp3",
