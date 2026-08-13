@@ -1,0 +1,254 @@
+[
+  {
+    "id": "track-01",
+    "title": "Позови меня с собой",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugachyova_-_Pozovi_menya_s_soboj_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 5, "type": "popup", "content": "🌹 АЛЛА РУЛИТ", "effect": "bounce", "position": "center", "duration": 5 },
+      { "time": 30, "type": "image", "src": "assets/images/жаба.jpg", "effect": "zoom-burst", "position": "bottom-right", "duration": 4 },
+      { "time": 60, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "fade-in", "position": "center", "duration": 10 },
+      { "time": 90, "type": "emoji-shower", "emojis": ["💃", "🔥", "✨"], "duration": 4 }
+    ]
+  },
+  {
+    "id": "track-02",
+    "title": "Бубен шамана",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugachyova_-_Buben_SHamana_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 10, "type": "popup", "content": "🥁 ШАМАН В ЗДАНИИ", "effect": "shake", "position": "top-left", "duration": 3 },
+      { "time": 45, "type": "image", "src": "assets/images/перцы.jpg", "effect": "spin-in", "position": "top-right", "duration": 5 },
+      { "time": 70, "type": "emoji-shower", "emojis": ["🔥", "🍄", "🔮"], "duration": 5 },
+      { "time": 120, "type": "video", "src": "assets/videos/круг2.mp4", "effect": "glitch", "position": "bottom-left", "duration": 8 }
+    ]
+  },
+  {
+    "id": "track-03",
+    "title": "Кафе танцующих огней",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugacheva_-_Alla_Pugacheva_Kafe_tancuyucshih_ognej_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 15, "type": "popup", "content": "💃 Ты чего сидишь?! ТАНЦУЙ!", "effect": "float-up", "position": "bottom-right", "duration": 4 },
+      { "time": 50, "type": "image", "src": "assets/images/мася.jpg", "effect": "zoom-burst", "position": "center", "duration": 5 },
+      { "time": 80, "type": "emoji-shower", "emojis": ["🍷", "✨", "💃"], "duration": 3 },
+      { "time": 110, "type": "video", "src": "assets/videos/круг 3.mp4", "effect": "fade-in", "position": "top-right", "duration": 10 }
+    ]
+  },
+  {
+    "id": "track-04",
+    "title": "Не отрекаются любя",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/P.A._-_Ne_otrekayutsya_lyubya_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 20, "type": "popup", "content": "😭 как же хорошо, боже мой", "effect": "fade-in", "position": "center", "duration": 5 },
+      { "time": 60, "type": "image", "src": "assets/images/плащ.jpg", "effect": "float-up", "position": "bottom-left", "duration": 6 },
+      { "time": 90, "type": "emoji-shower", "emojis": ["💔", "😢", "🌧️"], "duration": 4 },
+      { "time": 130, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "zoom-burst", "position": "top-right", "duration": 7 }
+    ]
+  },
+  {
+    "id": "track-05",
+    "title": "Женщина, которая поёт",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugachyova_-_ZHencshina_kotoraya_poyot_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 10, "type": "popup", "content": "🎤 ЭТО ШЕДЕВР", "effect": "bounce", "position": "top-right", "duration": 4 },
+      { "time": 40, "type": "image", "src": "assets/images/ключ.jpg", "effect": "spin-in", "position": "center", "duration": 5 },
+      { "time": 75, "type": "emoji-shower", "emojis": ["🌟", "👑", "🎤"], "duration": 6 },
+      { "time": 115, "type": "video", "src": "assets/videos/круг2.mp4", "effect": "fade-in", "position": "bottom-right", "duration": 8 }
+    ]
+  },
+  {
+    "id": "track-06",
+    "title": "Куда уходит детство",
+    "artist": "Алла Пугачёва",
+    "url": "PLACEHOLDER",
+    "triggers": [
+      { "time": 5, "type": "popup", "content": "🧸 Ностальгия в глаз попала...", "effect": "float-up", "position": "top-left", "duration": 4 },
+      { "time": 35, "type": "image", "src": "assets/images/фрукты.jpg", "effect": "zoom-burst", "position": "bottom-right", "duration": 5 },
+      { "time": 65, "type": "emoji-shower", "emojis": ["🎠", "🎈", "👶"], "duration": 4 },
+      { "time": 100, "type": "video", "src": "assets/videos/круг 3.mp4", "effect": "glitch", "position": "center", "duration": 9 }
+    ]
+  },
+  {
+    "id": "track-07",
+    "title": "Любовь одна виновата",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugachyova_-_Lyubov_odna_vinovata_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 12, "type": "popup", "content": "💔 Виновата любовь!", "effect": "shake", "position": "bottom-left", "duration": 3 },
+      { "time": 45, "type": "image", "src": "assets/images/хуля.webp", "effect": "spin-in", "position": "top-right", "duration": 5 },
+      { "time": 80, "type": "emoji-shower", "emojis": ["❤️‍🔥", "🥀", "😠"], "duration": 5 },
+      { "time": 110, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "bounce", "position": "center", "duration": 6 }
+    ]
+  },
+  {
+    "id": "track-08",
+    "title": "Мне нравится",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Ala_Pugacheva_-_mne_nravitsya_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 15, "type": "popup", "content": "🐸 жаба одобряет", "effect": "zoom-burst", "position": "top-right", "duration": 4 },
+      { "time": 50, "type": "image", "src": "assets/images/жаба.jpg", "effect": "fade-in", "position": "bottom-left", "duration": 6 },
+      { "time": 85, "type": "emoji-shower", "emojis": ["👍", "🐸", "✨"], "duration": 4 },
+      { "time": 120, "type": "video", "src": "assets/videos/круг2.mp4", "effect": "spin-in", "position": "center", "duration": 8 }
+    ]
+  },
+  {
+    "id": "track-09",
+    "title": "Посреди зимы",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugacheva_-_Posredi_zimy_1975._Studijnaya_zapis_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 8, "type": "popup", "content": "❄️ ХОЛОДНОООО", "effect": "shake", "position": "center", "duration": 4 },
+      { "time": 30, "type": "image", "src": "assets/images/перцы.jpg", "effect": "zoom-burst", "position": "top-left", "duration": 4 },
+      { "time": 70, "type": "emoji-shower", "emojis": ["❄️", "⛄", "🧣"], "duration": 5 },
+      { "time": 105, "type": "video", "src": "assets/videos/круг 3.mp4", "effect": "float-up", "position": "bottom-right", "duration": 7 }
+    ]
+  },
+  {
+    "id": "track-10",
+    "title": "Люди, люди",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugacheva_-_7._Lyudi_lyudi_A._Pugacheva_-_I._Reznik__(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 10, "type": "popup", "content": "👀 ЛЮДИ ЛЮДИ ЛЮДИ", "effect": "glitch", "position": "bottom-right", "duration": 5 },
+      { "time": 45, "type": "image", "src": "assets/images/мася.jpg", "effect": "bounce", "position": "top-right", "duration": 4 },
+      { "time": 75, "type": "emoji-shower", "emojis": ["👥", "👀", "🗣️"], "duration": 4 },
+      { "time": 115, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "fade-in", "position": "center", "duration": 9 }
+    ]
+  },
+  {
+    "id": "track-11",
+    "title": "Усталость",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugachyova_-_Ustalost_1982_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 14, "type": "popup", "content": "🎭 1982 год. Дискотека в клубе.", "effect": "fade-in", "position": "top-left", "duration": 6 },
+      { "time": 40, "type": "image", "src": "assets/images/плащ.jpg", "effect": "float-up", "position": "center", "duration": 5 },
+      { "time": 80, "type": "emoji-shower", "emojis": ["🥱", "💤", "🍷"], "duration": 5 },
+      { "time": 110, "type": "video", "src": "assets/videos/круг2.mp4", "effect": "zoom-burst", "position": "bottom-left", "duration": 8 }
+    ]
+  },
+  {
+    "id": "track-12",
+    "title": "Я больше не ревную",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/1981_Alla_Pugacheva_-_YA_bolshe_ne_revnuyu_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 11, "type": "popup", "content": "😎 СВОБОДА!", "effect": "bounce", "position": "center", "duration": 4 },
+      { "time": 50, "type": "image", "src": "assets/images/ключ.jpg", "effect": "spin-in", "position": "bottom-right", "duration": 5 },
+      { "time": 85, "type": "emoji-shower", "emojis": ["💅", "💁‍♀️", "🔥"], "duration": 5 },
+      { "time": 125, "type": "video", "src": "assets/videos/круг 3.mp4", "effect": "shake", "position": "top-left", "duration": 6 }
+    ]
+  },
+  {
+    "id": "track-13",
+    "title": "Как тревожен этот путь",
+    "artist": "Алла Пугачёва",
+    "url": "PLACEHOLDER",
+    "triggers": [
+      { "time": 18, "type": "popup", "content": "🛤️ Путь неблизкий...", "effect": "float-up", "position": "bottom-left", "duration": 5 },
+      { "time": 55, "type": "image", "src": "assets/images/фрукты.jpg", "effect": "zoom-burst", "position": "top-right", "duration": 4 },
+      { "time": 90, "type": "emoji-shower", "emojis": ["🛣️", "🚶‍♀️", "🌠"], "duration": 5 },
+      { "time": 130, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "fade-in", "position": "center", "duration": 10 }
+    ]
+  },
+  {
+    "id": "track-14",
+    "title": "Старинные часы",
+    "artist": "Алла Пугачёва",
+    "url": "PLACEHOLDER",
+    "triggers": [
+      { "time": 9, "type": "popup", "content": "⏰ ВРЕМЯ ИДЕТ!", "effect": "shake", "position": "top-right", "duration": 4 },
+      { "time": 45, "type": "image", "src": "assets/images/хуля.webp", "effect": "spin-in", "position": "center", "duration": 5 },
+      { "time": 75, "type": "emoji-shower", "emojis": ["⏳", "🕰️", "⌛"], "duration": 4 },
+      { "time": 115, "type": "video", "src": "assets/videos/круг2.mp4", "effect": "glitch", "position": "bottom-left", "duration": 7 }
+    ]
+  },
+  {
+    "id": "track-15",
+    "title": "Миллион роз",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugachyova_-_Million_roz_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 10, "type": "popup", "content": "🌹 АЛЛА РУЛИТ", "effect": "zoom-burst", "position": "center", "duration": 5 },
+      { "time": 30, "type": "emoji-shower", "emojis": ["🌹", "🥀", "🌺", "💐"], "duration": 6 },
+      { "time": 65, "type": "image", "src": "assets/images/жаба.jpg", "effect": "bounce", "position": "top-left", "duration": 5 },
+      { "time": 100, "type": "video", "src": "assets/videos/круг 3.mp4", "effect": "fade-in", "position": "bottom-right", "duration": 12 }
+    ]
+  },
+  {
+    "id": "track-16",
+    "title": "Расскажите птицы",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/RASSKAZHITE_PTICY_-_PUGACHYOVA_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 12, "type": "popup", "content": "🐦 ПТИЦЫ, РАССКАЖИТЕ!", "effect": "float-up", "position": "top-right", "duration": 4 },
+      { "time": 50, "type": "image", "src": "assets/images/перцы.jpg", "effect": "spin-in", "position": "center", "duration": 5 },
+      { "time": 85, "type": "emoji-shower", "emojis": ["🕊️", "🦅", "🦢"], "duration": 4 },
+      { "time": 120, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "shake", "position": "bottom-left", "duration": 6 }
+    ]
+  },
+  {
+    "id": "track-17",
+    "title": "Самолёты улетают",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugachyova_-_Samolety_uletayut_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 15, "type": "popup", "content": "✈️ ПОЛЕТЕЛИИИИ", "effect": "zoom-burst", "position": "bottom-right", "duration": 5 },
+      { "time": 60, "type": "image", "src": "assets/images/мася.jpg", "effect": "fade-in", "position": "top-left", "duration": 6 },
+      { "time": 95, "type": "emoji-shower", "emojis": ["✈️", "☁️", "👋"], "duration": 4 },
+      { "time": 130, "type": "video", "src": "assets/videos/круг2.mp4", "effect": "bounce", "position": "center", "duration": 8 }
+    ]
+  },
+  {
+    "id": "track-18",
+    "title": "Озеро надежды",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugacheva_-_Ozero_Nadezhdy_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 20, "type": "popup", "content": "🌊 ОЗЕРО НАДЕЖДЫ", "effect": "float-up", "position": "center", "duration": 4 },
+      { "time": 70, "type": "image", "src": "assets/images/плащ.jpg", "effect": "spin-in", "position": "bottom-left", "duration": 5 },
+      { "time": 100, "type": "emoji-shower", "emojis": ["💧", "🌊", "🦆"], "duration": 5 },
+      { "time": 140, "type": "video", "src": "assets/videos/круг 3.mp4", "effect": "fade-in", "position": "top-right", "duration": 10 }
+    ]
+  },
+  {
+    "id": "track-19",
+    "title": "Любовь похожая на сон",
+    "artist": "Алла Пугачёва",
+    "url": "PLACEHOLDER",
+    "triggers": [
+      { "time": 15, "type": "popup", "content": "☁️ Это все сон?", "effect": "fade-in", "position": "top-right", "duration": 5 },
+      { "time": 55, "type": "image", "src": "assets/images/ключ.jpg", "effect": "zoom-burst", "position": "center", "duration": 4 },
+      { "time": 85, "type": "emoji-shower", "emojis": ["☁️", "🌙", "✨"], "duration": 5 },
+      { "time": 125, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "glitch", "position": "bottom-right", "duration": 8 }
+    ]
+  },
+  {
+    "id": "track-20",
+    "title": "Свеча горела на столе",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/7.Alla_Pugacheva_-_Svecha_gorela_na_stole_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 12, "type": "popup", "content": "🕯️ Горела свеча...", "effect": "shake", "position": "bottom-left", "duration": 4 },
+      { "time": 50, "type": "image", "src": "assets/images/фрукты.jpg", "effect": "bounce", "position": "top-left", "duration": 5 },
+      { "time": 90, "type": "emoji-shower", "emojis": ["🕯️", "🔥", "📜"], "duration": 4 },
+      { "time": 120, "type": "video", "src": "assets/videos/круг2.mp4", "effect": "fade-in", "position": "center", "duration": 7 }
+    ]
+  },
+  {
+    "id": "track-21",
+    "title": "Этот мир придуман не мною",
+    "artist": "Алла Пугачёва",
+    "url": "assets/audio/Alla_Pugacheva_-_Etot_mir_priduman_ne_mnoyu_(SkySound7.com).mp3",
+    "triggers": [
+      { "time": 8, "type": "popup", "content": "🌍 ЭТОТ МИР ПРИДУМАН НЕ МНОЙ", "effect": "zoom-burst", "position": "center", "duration": 5 },
+      { "time": 45, "type": "image", "src": "assets/images/хуля.webp", "effect": "spin-in", "position": "top-right", "duration": 5 },
+      { "time": 75, "type": "emoji-shower", "emojis": ["🌍", "🌞", "🌻"], "duration": 5 },
+      { "time": 115, "type": "video", "src": "assets/videos/круг 3.mp4", "effect": "bounce", "position": "bottom-left", "duration": 9 }
+    ]
+  }
+]
