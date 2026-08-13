@@ -31,6 +31,7 @@ class MediaShow {
   start() {
     this.running = true;
     this._showNext();
+    if (this.interval) clearInterval(this.interval);
     this.interval = setInterval(() => this._showNext(), this.MIN_INTERVAL);
   }
 
@@ -58,52 +59,58 @@ class MediaShow {
     }
   }
 
+  _getSafeZone() {
+    const zones = [
+      { top: '12px', left: '12px' },
+      { top: '12px', right: '12px' },
+      { bottom: '16px', left: '12px' },
+      { bottom: '16px', right: '12px' },
+      { top: '42%', left: '8px' },
+      { top: '42%', right: '8px' }
+    ];
+    return zones[Math.floor(Math.random() * zones.length)];
+  }
+
   _showImage() {
     const src = MEDIA_IMAGES[Math.floor(Math.random() * MEDIA_IMAGES.length)];
     
     const el = document.createElement('img');
     el.src = src;
     
-    // Случайный размер: маленький / средний / большой (веса 20% / 50% / 30%)
+    // Адаптивный безопасный размер (не вылезает за пределы мобильного экрана)
+    const maxAvailable = Math.min(220, Math.floor(window.innerWidth * 0.40));
     const roll = Math.random();
     let size;
-    if (roll < 0.2) {
-      size = 55 + Math.floor(Math.random() * 45); // 55-100px маленький
+    if (roll < 0.25) {
+      size = Math.max(60, Math.floor(maxAvailable * 0.5)); // маленький
     } else if (roll < 0.7) {
-      size = 110 + Math.floor(Math.random() * 80); // 110-190px средний
+      size = Math.max(85, Math.floor(maxAvailable * 0.75)); // средний
     } else {
-      size = 200 + Math.floor(Math.random() * 130); // 200-330px большой
+      size = maxAvailable; // максимальный безопасный
     }
+
     el.style.width = size + 'px';
     el.style.height = size + 'px';
+    el.style.maxWidth = '42vw';
+    el.style.maxHeight = '36vh';
     el.style.objectFit = 'cover';
     el.style.borderRadius = '12px';
     el.style.position = 'fixed';
-    el.style.zIndex = '50';
+    el.style.zIndex = '150';
     el.style.opacity = '0';
     el.style.pointerEvents = 'auto';
     el.style.cursor = 'zoom-in';
-    el.style.boxShadow = '0 4px 20px rgba(0,0,0,0.6), 0 0 15px rgba(220,208,255,0.3)';
+    el.style.boxShadow = '0 6px 20px rgba(0,0,0,0.5), 0 0 12px rgba(0, 242, 254, 0.3)';
+    el.style.border = '1px solid rgba(255, 255, 255, 0.4)';
     
-    // Рандомная позиция в четырёх зонах экрана
-    // Края: не очень центр (там плеер)
-    const zones = [
-      { top: '5%', left: '2%' },
-      { top: '5%', right: '2%' },
-      { bottom: '5%', left: '2%' },
-      { bottom: '5%', right: '2%' },
-      { top: '40%', left: '2%' },
-      { top: '40%', right: '2%' }
-    ];
-    const zone = zones[Math.floor(Math.random() * zones.length)];
+    const zone = this._getSafeZone();
     Object.assign(el.style, zone);
     
-    // Случайный эффект появления
     const effects = ['trigger-bounce-in', 'trigger-zoom-burst', 'trigger-spin-in', 'trigger-shake'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     
-    // Случайный небольшой поворот
-    const rot = (Math.random() - 0.5) * 20;
+    // Легкий наклон
+    const rot = (Math.random() - 0.5) * 12;
     el.style.transform = `rotate(${rot}deg)`;
 
     let isFullscreen = false;
@@ -113,13 +120,13 @@ class MediaShow {
       if (removeTimeout) clearTimeout(removeTimeout);
       removeTimeout = setTimeout(() => {
         if (isFullscreen) return;
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         el.style.opacity = '0';
-        el.style.transform = `rotate(${rot}deg) scale(0.8)`;
+        el.style.transform = `rotate(${rot}deg) scale(0.7)`;
         setTimeout(() => { 
           if (el.parentNode) el.remove(); 
-          this.activeItems--; 
-        }, 700);
+          this.activeItems = Math.max(0, this.activeItems - 1); 
+        }, 550);
       }, delay);
     };
 
@@ -142,12 +149,11 @@ class MediaShow {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         el.style.transition = 'opacity 0.4s ease';
-        el.style.opacity = '0.85';
+        el.style.opacity = '0.92';
         el.classList.add(effect);
       });
     });
     
-    // Автоудаление через 5-9 секунд
     const duration = 5000 + Math.random() * 4000;
     scheduleRemoval(duration);
   }
@@ -162,32 +168,36 @@ class MediaShow {
     videoEl.playsInline = true;
     videoEl.loop = true;
     
-    // размер 150-220px
-    const size = 150 + Math.floor(Math.random() * 70);
+    const maxAvailable = Math.min(220, Math.floor(window.innerWidth * 0.42));
+    const size = Math.max(110, maxAvailable);
+
     videoEl.style.width = size + 'px';
     videoEl.style.height = size + 'px';
+    videoEl.style.maxWidth = '44vw';
+    videoEl.style.maxHeight = '38vh';
     videoEl.style.objectFit = 'cover';
-    videoEl.style.borderRadius = '8px';
+    videoEl.style.borderRadius = '10px';
     videoEl.style.display = 'block';
-    videoEl.style.boxShadow = '0 4px 20px rgba(0,0,0,0.6), 0 0 15px rgba(220,208,255,0.3)';
+    videoEl.style.boxShadow = '0 6px 20px rgba(0,0,0,0.6)';
+    videoEl.style.border = '1px solid rgba(0, 242, 254, 0.4)';
 
-    // Кнопка звука — фиксированна поверх видео
+    // Кнопка звука
     const muteBtn = document.createElement('button');
     muteBtn.textContent = '🔇';
     muteBtn.style.cssText = `
       position: absolute;
       bottom: 6px; right: 6px;
-      background: rgba(0,0,0,0.6);
-      border: none;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.4);
       border-radius: 50%;
       width: 32px; height: 32px;
       font-size: 14px;
       cursor: pointer;
       color: white;
       display: flex; align-items: center; justify-content: center;
-      z-index: 1;
-      pointer-events: all;
-      transition: background 0.2s;
+      z-index: 2;
+      pointer-events: auto;
+      transition: transform 0.15s;
     `;
     muteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -195,31 +205,22 @@ class MediaShow {
       muteBtn.textContent = videoEl.muted ? '🔇' : '🔊';
     });
 
-    // Обёрни видео в wrapper div вместе с кнопкой
     const wrapper = document.createElement('div');
     wrapper.style.cssText = `
       position: fixed;
-      z-index: 52;
-      pointer-events: all;
+      z-index: 155;
+      pointer-events: auto;
       display: inline-block;
     `;
     
-    const zones = [
-      { top: '5%', left: '2%' },
-      { top: '5%', right: '2%' },
-      { bottom: '5%', left: '2%' },
-      { bottom: '5%', right: '2%' },
-      { top: '40%', left: '2%' },
-      { top: '40%', right: '2%' }
-    ];
-    const zone = zones[Math.floor(Math.random() * zones.length)];
+    const zone = this._getSafeZone();
     Object.assign(wrapper.style, zone);
     wrapper.style.opacity = '0';
     
     const effects = ['trigger-bounce-in', 'trigger-zoom-burst', 'trigger-spin-in', 'trigger-shake'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     
-    const rot = (Math.random() - 0.5) * 20;
+    const rot = (Math.random() - 0.5) * 10;
     wrapper.style.transform = `rotate(${rot}deg)`;
     
     wrapper.appendChild(videoEl);
@@ -230,26 +231,25 @@ class MediaShow {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         wrapper.style.transition = 'opacity 0.4s ease';
-        wrapper.style.opacity = '0.85';
+        wrapper.style.opacity = '0.95';
         wrapper.classList.add(effect);
       });
     });
     
-    // Длительность: 7000 + random*5000 мс
     const duration = 7000 + Math.random() * 5000;
     setTimeout(() => {
       wrapper.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
       wrapper.style.opacity = '0';
-      wrapper.style.transform = `rotate(${rot}deg) scale(0.8)`;
+      wrapper.style.transform = `rotate(${rot}deg) scale(0.7)`;
       setTimeout(() => { 
         if (wrapper.parentNode) wrapper.remove(); 
-        this.activeItems--; 
-      }, 700);
+        this.activeItems = Math.max(0, this.activeItems - 1); 
+      }, 650);
     }, duration);
   }
 
   _showEmojiShower() {
-    const count = 12 + Math.floor(Math.random() * 10);
+    const count = 12 + Math.floor(Math.random() * 8);
     const emojis = [
       ALL_EMOJIS[Math.floor(Math.random() * ALL_EMOJIS.length)],
       ALL_EMOJIS[Math.floor(Math.random() * ALL_EMOJIS.length)],
@@ -261,17 +261,15 @@ class MediaShow {
         const span = document.createElement('span');
         span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
         span.style.position = 'fixed';
-        span.style.left = (Math.random() * 90 + 5) + 'vw';
+        span.style.left = (Math.random() * 86 + 6) + 'vw';
         span.style.top = '-40px';
-        span.style.fontSize = (18 + Math.random() * 28) + 'px';
-        span.style.zIndex = '55';
+        span.style.fontSize = (18 + Math.random() * 24) + 'px';
+        span.style.zIndex = '500';
         span.style.pointerEvents = 'none';
-        span.style.animation = `trigger-confetti-fall ${1.5 + Math.random() * 2.5}s ease-in forwards`;
+        span.style.animation = `trigger-confetti-fall ${1.5 + Math.random() * 2.0}s ease-in forwards`;
         document.body.appendChild(span);
-        setTimeout(() => {
-          if (span.parentNode) span.remove();
-        }, 5000);
-      }, i * 100);
+        setTimeout(() => span.remove(), 4500);
+      }, i * 90);
     }
   }
 }

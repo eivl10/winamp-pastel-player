@@ -217,7 +217,6 @@ function showTrackChangeBurst(track) {
   if (btnPrev) {
     btnPrev.addEventListener('click', () => {
       engine.prevTrack();
-      loadAndUpdateUI(engine.currentIndex);
     });
   }
 
@@ -225,7 +224,6 @@ function showTrackChangeBurst(track) {
   if (btnNext) {
     btnNext.addEventListener('click', () => {
       engine.nextTrack();
-      loadAndUpdateUI(engine.currentIndex);
     });
   }
 
@@ -268,11 +266,23 @@ function showTrackChangeBurst(track) {
     isAppInitialized = true;
     engine.init(tracks);
     renderPlaylist(tracks);
-    // Авто-старт скринсейвера на фоне
     screensaver.start();
-    // Авто-старт mediashow
     if (mediaShow) mediaShow.start();
     loadAndUpdateUI(0);
+
+    // Автоплей при входе
+    const playPromise = engine.play();
+    if (playPromise) {
+      playPromise.catch(() => {
+        const startOnUserAction = () => {
+          engine.play();
+          window.removeEventListener('click', startOnUserAction);
+          window.removeEventListener('touchstart', startOnUserAction);
+        };
+        window.addEventListener('click', startOnUserAction, { once: true });
+        window.addEventListener('touchstart', startOnUserAction, { once: true });
+      });
+    }
   }
 
   setupIOSUnlock(engine, () => {
