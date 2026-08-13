@@ -20,13 +20,15 @@
 
   <!-- Main Player Container -->
   <div id="app">
-    <div class="winamp-window">
-      <!-- Titlebar -->
+    <div class="winamp-window" id="winamp-window">
+      <!-- Titlebar with Large Minimize Button -->
       <div class="winamp-titlebar">
         <span class="winamp-title">WINAMP</span>
         <div class="winamp-titlebar-buttons">
-          <button class="winamp-btn-minimize" aria-label="Minimize"></button>
-          <button class="winamp-btn-close" aria-label="Close"></button>
+          <button id="btn-toggle-minimize" class="winamp-btn-large-minimize" title="Свернуть / Развернуть плеер">
+            <span class="min-icon">🗕</span>
+            <span class="min-text">Свернуть</span>
+          </button>
         </div>
       </div>
 
@@ -48,7 +50,7 @@
         <button id="btn-stop" title="Stop">⏹</button>
         <button id="btn-next" title="Next">⏭</button>
         <button id="btn-shuffle" title="Shuffle">🔀</button>
-        <button id="btn-screensaver" title="Screensaver">📺</button>
+        <button id="btn-screensaver" title="Screensaver Mode">📺</button>
       </div>
 
       <!-- Seek Bar -->
@@ -66,6 +68,22 @@
         <div id="playlist-container"></div>
       </div>
     </div>
+  </div>
+
+  <!-- Bottom Toggles Bar (3 grey toggle buttons) -->
+  <div id="bottom-toggles-bar">
+    <button id="toggle-screensaver" class="toggle-btn active" title="Скринсейвер: Вкл/Выкл">
+      <span class="toggle-icon">📺</span>
+      <span class="toggle-text">Скринсейвер</span>
+    </button>
+    <button id="toggle-triggers" class="toggle-btn active" title="Эмодзи и надписи: Вкл/Выкл">
+      <span class="toggle-icon">💬</span>
+      <span class="toggle-text">Эмодзи</span>
+    </button>
+    <button id="toggle-mediashow" class="toggle-btn active" title="Фото и видео: Вкл/Выкл">
+      <span class="toggle-icon">🖼️</span>
+      <span class="toggle-text">Медиа</span>
+    </button>
   </div>
 
   <!-- Dynamic Layers -->

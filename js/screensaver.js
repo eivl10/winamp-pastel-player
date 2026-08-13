@@ -183,6 +183,20 @@ class ScreensaverEngine {
     });
   }
 
+  toggleEnabled(enable) {
+    this.enabled = typeof enable === 'boolean' ? enable : !this.enabled;
+    if (this.canvas) {
+      this.canvas.style.display = this.enabled ? 'block' : 'none';
+    }
+    if (!this.enabled) {
+      this.stop();
+      if (this.ctx) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    } else {
+      this.start();
+    }
+    return this.enabled;
+  }
+
   stop() {
     this.running = false;
     if (this.animFrame) {

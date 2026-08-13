@@ -4,6 +4,7 @@ class TriggerEngine {
     this.triggers = [];
     this.fired = new Set();
     this.timers = [];
+    this.enabled = true;
   }
 
   setTriggers(triggers) {
@@ -11,7 +12,14 @@ class TriggerEngine {
     this.reset();
   }
 
+  toggle(enable) {
+    this.enabled = typeof enable === 'boolean' ? enable : !this.enabled;
+    if (!this.enabled) this.reset();
+    return this.enabled;
+  }
+
   tick(currentTime) {
+    if (!this.enabled) return;
     for (let i = 0; i < this.triggers.length; i++) {
       const trigger = this.triggers[i];
       if (!this.fired.has(i) && Math.abs(currentTime - trigger.time) < 1.5) {

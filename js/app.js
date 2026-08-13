@@ -259,6 +259,50 @@ function showTrackChangeBurst(track) {
     });
   }
 
+  // Minimize / Expand Toggle
+  const winampWindow = document.getElementById('winamp-window');
+  const btnToggleMin = document.getElementById('btn-toggle-minimize');
+  if (btnToggleMin && winampWindow) {
+    btnToggleMin.addEventListener('click', () => {
+      const isMin = winampWindow.classList.toggle('minimized');
+      const icon = btnToggleMin.querySelector('.min-icon');
+      const text = btnToggleMin.querySelector('.min-text');
+      if (icon) icon.textContent = isMin ? '🗖' : '🗕';
+      if (text) text.textContent = isMin ? 'Развернуть' : 'Свернуть';
+      btnToggleMin.title = isMin ? 'Развернуть плеер' : 'Свернуть плеер';
+    });
+  }
+
+  // Bottom Toggles Bar
+  const toggleScreensaver = document.getElementById('toggle-screensaver');
+  if (toggleScreensaver) {
+    toggleScreensaver.addEventListener('click', () => {
+      const enabled = screensaver.toggleEnabled();
+      toggleScreensaver.classList.toggle('active', enabled);
+      toggleScreensaver.classList.toggle('off', !enabled);
+    });
+  }
+
+  const toggleTriggers = document.getElementById('toggle-triggers');
+  if (toggleTriggers) {
+    toggleTriggers.addEventListener('click', () => {
+      const enabled = triggerEngine.toggle();
+      toggleTriggers.classList.toggle('active', enabled);
+      toggleTriggers.classList.toggle('off', !enabled);
+    });
+  }
+
+  const toggleMediashow = document.getElementById('toggle-mediashow');
+  if (toggleMediashow) {
+    toggleMediashow.addEventListener('click', () => {
+      if (mediaShow) {
+        const enabled = mediaShow.toggle();
+        toggleMediashow.classList.toggle('active', enabled);
+        toggleMediashow.classList.toggle('off', !enabled);
+      }
+    });
+  }
+
   // 6. Initialization Logic
   let isAppInitialized = false;
   function startApp() {

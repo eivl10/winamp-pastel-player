@@ -7,10 +7,10 @@
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
   overflow: hidden;
   position: relative;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
 }
 
-/* Zero scanlines - completely clean solid chassis */
-
+/* Titlebar */
 .winamp-titlebar {
   background: linear-gradient(90deg, #1C6B7B, #0E424D);
   border-bottom: 1px solid #245866;
@@ -25,7 +25,7 @@
   font-family: 'Share Tech Mono', monospace;
   color: #E8FCFF;
   letter-spacing: 3px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
   text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
 }
@@ -33,35 +33,37 @@
 .winamp-titlebar .buttons,
 .winamp-titlebar-buttons {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 
-.winamp-titlebar .btn-min,
-.winamp-titlebar .btn-close,
-.winamp-btn-minimize,
-.winamp-btn-close {
-  width: 12px;
-  height: 12px;
-  min-width: 12px;
-  min-height: 12px;
-  border-radius: 50%;
-  background: #FFD166;
-  border: 1px solid rgba(0, 0, 0, 0.3);
+/* Large Prominent Minimize / Restore Button */
+.winamp-btn-large-minimize {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(0, 242, 254, 0.5);
+  border-radius: 6px;
+  color: #E8FCFF;
+  padding: 4px 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: bold;
   cursor: pointer;
-  padding: 0;
-  margin: 0;
-  display: inline-block;
-  opacity: 0.8;
-  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
 }
 
-.winamp-btn-close, .winamp-titlebar .btn-close {
-  background: #FF5E7E;
+.winamp-btn-large-minimize:hover,
+.winamp-btn-large-minimize:active {
+  background: rgba(0, 242, 254, 0.25);
+  border-color: #00F2FE;
+  color: #00F2FE;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
 }
 
-.winamp-btn-minimize:hover, .winamp-btn-close:hover {
-  opacity: 1;
+.winamp-btn-large-minimize .min-icon {
+  font-size: 12px;
 }
 
 .winamp-display {
@@ -222,6 +224,109 @@
   white-space: nowrap;
 }
 
+/* ===== MINIMIZED (WINDOWSHADE) MODE ===== */
+.winamp-window.minimized {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.winamp-window.minimized .winamp-playlist,
+.winamp-window.minimized .winamp-volume-container,
+.winamp-window.minimized #bitrate-display,
+.winamp-window.minimized #duration-display,
+.winamp-window.minimized #btn-prev,
+.winamp-window.minimized #btn-next,
+.winamp-window.minimized #btn-stop,
+.winamp-window.minimized #btn-shuffle,
+.winamp-window.minimized #btn-screensaver {
+  display: none !important;
+}
+
+.winamp-window.minimized .winamp-display {
+  margin: 6px 8px 4px 8px;
+  padding: 6px 10px;
+}
+
+.winamp-window.minimized #time-display {
+  font-size: 18px;
+}
+
+.winamp-window.minimized .winamp-controls {
+  padding: 4px 10px 8px 10px;
+  border-top: none;
+  background: transparent;
+}
+
+.winamp-window.minimized .winamp-controls button {
+  min-width: 100%;
+  height: 38px;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
+.winamp-window.minimized .winamp-seek-container {
+  padding: 4px 10px 2px 10px;
+}
+
+/* ===== BOTTOM TOGGLE BUTTONS BAR ===== */
+#bottom-toggles-bar {
+  position: fixed;
+  bottom: max(14px, env(safe-area-inset-bottom, 14px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 600;
+  background: rgba(14, 20, 28, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  border-radius: 30px;
+  border: 1px solid rgba(56, 78, 104, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  max-width: 95vw;
+}
+
+.toggle-btn {
+  background: #1C2432;
+  border: 1px solid #334458;
+  color: #8C9EAE;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+
+.toggle-btn .toggle-icon {
+  font-size: 14px;
+}
+
+.toggle-btn.active {
+  color: #00F2FE;
+  border-color: #00F2FE;
+  background: #142838;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+}
+
+.toggle-btn.off {
+  color: #505F6E;
+  border-color: #222B36;
+  background: #10141C;
+  opacity: 0.55;
+  filter: grayscale(0.8);
+}
+
+.toggle-btn:active {
+  transform: scale(0.95);
+}
+
 /* ===== OVERLAYS & POPUPS ===== */
 .overlay-popup {
   background: rgba(14, 22, 34, 0.92);
@@ -241,31 +346,6 @@
 
 .overlay-popup.visible {
   opacity: 1;
-}
-
-#ios-unlock-screen {
-  position: fixed;
-  z-index: 10000;
-  inset: 0;
-  background: rgba(11, 16, 23, 0.95);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-}
-
-#ios-unlock-screen button {
-  padding: 18px 36px;
-  border: 2px solid #00F2FE;
-  color: #00F2FE;
-  background: rgba(0, 242, 254, 0.1);
-  border-radius: 10px;
-  font-size: 18px;
-  font-family: 'Share Tech Mono', monospace;
-  font-weight: bold;
-  animation: glow-pulse 2s infinite;
-  cursor: pointer;
 }
 
 /* ===== FULLSCREEN IMAGE ZOOM (ALWAYS TOP OF WINAMP) ===== */
@@ -357,6 +437,54 @@
   60% { transform: translate(4px, 4px); filter: hue-rotate(180deg); }
   80% { transform: translate(4px, -4px); }
   100% { transform: translate(0); }
+}
+
+/* ===== ZERO-GRAVITY FLOATING (WEIGHTLESSNESS) ===== */
+.zero-gravity-1 {
+  animation: zeroGravityFloat1 7s ease-in-out infinite alternate !important;
+}
+
+.zero-gravity-2 {
+  animation: zeroGravityFloat2 8.5s ease-in-out infinite alternate !important;
+}
+
+.zero-gravity-3 {
+  animation: zeroGravityFloat3 6.5s ease-in-out infinite alternate !important;
+}
+
+.zero-gravity-4 {
+  animation: zeroGravityFloat4 9s ease-in-out infinite alternate !important;
+}
+
+@keyframes zeroGravityFloat1 {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  25%  { transform: translate(12px, -18px) rotate(3deg) scale(1.02); }
+  50%  { transform: translate(-10px, -28px) rotate(-2deg) scale(0.98); }
+  75%  { transform: translate(-20px, -8px) rotate(-4deg) scale(1.01); }
+  100% { transform: translate(8px, 14px) rotate(2deg) scale(1); }
+}
+
+@keyframes zeroGravityFloat2 {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  30%  { transform: translate(-16px, 14px) rotate(-4deg) scale(1.03); }
+  60%  { transform: translate(18px, 22px) rotate(3deg) scale(0.97); }
+  85%  { transform: translate(24px, -12px) rotate(2deg) scale(1.02); }
+  100% { transform: translate(-6px, -18px) rotate(-2deg) scale(1); }
+}
+
+@keyframes zeroGravityFloat3 {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  35%  { transform: translate(22px, -14px) rotate(4deg) scale(0.98); }
+  70%  { transform: translate(-14px, 20px) rotate(-3deg) scale(1.03); }
+  100% { transform: translate(10px, 16px) rotate(1deg) scale(1); }
+}
+
+@keyframes zeroGravityFloat4 {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  25%  { transform: translate(-18px, -20px) rotate(-3deg) scale(1.02); }
+  55%  { transform: translate(16px, -12px) rotate(4deg) scale(0.97); }
+  80%  { transform: translate(-12px, 18px) rotate(-2deg) scale(1.03); }
+  100% { transform: translate(14px, 8px) rotate(2deg) scale(1); }
 }
 
 @keyframes trigger-confetti-fall {

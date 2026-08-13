@@ -1,24 +1,24 @@
 const MEDIA_IMAGES = [
-  'assets/images/жаба.jpg',
-  'assets/images/ключ.jpg',
-  'assets/images/мася.jpg',
-  'assets/images/перцы.jpg',
-  'assets/images/плащ.jpg',
-  'assets/images/фрукты.jpg',
-  'assets/images/хуля.webp',
-  'assets/images/photo_2026-08-13_19-51-07.jpg',
-  'assets/images/ирка.jpg',
-  'assets/images/мася хуля.jpg',
-  'assets/images/плащ 2.jpg',
-  'assets/images/хуля и мы.jpg'
+  'assets/images/photo_2026-08-13_19-51-07.webp',
+  'assets/images/жаба.webp',
+  'assets/images/ирка.webp',
+  'assets/images/ключ.webp',
+  'assets/images/мася хуля.webp',
+  'assets/images/мася.webp',
+  'assets/images/перцы.webp',
+  'assets/images/плащ 2.webp',
+  'assets/images/плащ.webp',
+  'assets/images/фрукты.webp',
+  'assets/images/хуля и мы.webp',
+  'assets/images/хуля.webp'
 ];
 
 const MEDIA_VIDEOS = [
-  'assets/videos/кружок1.mp4',
-  'assets/videos/круг2.mp4',
   'assets/videos/круг 3.mp4',
-  'assets/videos/обнимахи.MOV',
-  'assets/videos/шаги.MOV'
+  'assets/videos/круг2.mp4',
+  'assets/videos/кружок1.mp4',
+  'assets/videos/обнимахи.mp4',
+  'assets/videos/шаги.mp4'
 ];
 
 const ALL_EMOJIS = ['🌹', '💃', '✨', '🔥', '🎺', '🐸', '👑', '🌟', '💫', '🌊', '🦀', '🍍', '🍰', '🌈'];
@@ -29,11 +29,23 @@ class MediaShow {
     this.running = false;
     this.interval = null;
     this.activeItems = 0;
-    this.MAX_ITEMS = 3;
-    this.MIN_INTERVAL = 3500; // мин 3.5 секунды между появлениями
+    this.MAX_ITEMS = 4;
+    this.MIN_INTERVAL = 3000; // каждые 3 сек
+    this.enabled = true;
+  }
+
+  toggle(enable) {
+    this.enabled = typeof enable === 'boolean' ? enable : !this.enabled;
+    if (!this.enabled) {
+      this.stop();
+    } else {
+      this.start();
+    }
+    return this.enabled;
   }
 
   start() {
+    if (!this.enabled) return;
     this.running = true;
     this._showNext();
     if (this.interval) clearInterval(this.interval);
@@ -53,7 +65,6 @@ class MediaShow {
   _showNext() {
     if (!this.running || this.activeItems >= this.MAX_ITEMS) return;
     
-    // Чередуем: изображение, видео, emoji-shower (веса 7:2:1)
     const roll = Math.random();
     if (roll < 0.65) {
       this._showImage();
@@ -66,12 +77,14 @@ class MediaShow {
 
   _getSafeZone() {
     const zones = [
-      { top: '12px', left: '12px' },
-      { top: '12px', right: '12px' },
-      { bottom: '16px', left: '12px' },
-      { bottom: '16px', right: '12px' },
-      { top: '42%', left: '8px' },
-      { top: '42%', right: '8px' }
+      { top: '10px', left: '10px' },
+      { top: '10px', right: '10px' },
+      { bottom: '70px', left: '10px' },
+      { bottom: '70px', right: '10px' },
+      { top: '35%', left: '8px' },
+      { top: '35%', right: '8px' },
+      { top: '55%', left: '12px' },
+      { top: '55%', right: '12px' }
     ];
     return zones[Math.floor(Math.random() * zones.length)];
   }
@@ -82,41 +95,40 @@ class MediaShow {
     const el = document.createElement('img');
     el.src = src;
     
-    // Адаптивный безопасный размер (не вылезает за пределы мобильного экрана)
-    const maxAvailable = Math.min(220, Math.floor(window.innerWidth * 0.40));
+    // Случайный размер: от компактного до крупного (в невесомости)
     const roll = Math.random();
     let size;
+    const isMobile = window.innerWidth <= 480;
+    
     if (roll < 0.25) {
-      size = Math.max(60, Math.floor(maxAvailable * 0.5)); // маленький
-    } else if (roll < 0.7) {
-      size = Math.max(85, Math.floor(maxAvailable * 0.75)); // средний
+      size = isMobile ? (75 + Math.floor(Math.random() * 30)) : (100 + Math.floor(Math.random() * 40)); // маленький
+    } else if (roll < 0.65) {
+      size = isMobile ? (130 + Math.floor(Math.random() * 45)) : (170 + Math.floor(Math.random() * 60)); // средний
     } else {
-      size = maxAvailable; // максимальный безопасный
+      // КРУПНЫЙ размер (впечатляющий вид)
+      size = isMobile ? Math.min(260, Math.floor(window.innerWidth * 0.65)) : (270 + Math.floor(Math.random() * 90));
     }
 
     el.style.width = size + 'px';
     el.style.height = size + 'px';
-    el.style.maxWidth = '42vw';
-    el.style.maxHeight = '36vh';
+    el.style.maxWidth = '68vw';
+    el.style.maxHeight = '48vh';
     el.style.objectFit = 'cover';
-    el.style.borderRadius = '12px';
+    el.style.borderRadius = '14px';
     el.style.position = 'fixed';
     el.style.zIndex = '150';
     el.style.opacity = '0';
     el.style.pointerEvents = 'auto';
     el.style.cursor = 'zoom-in';
-    el.style.boxShadow = '0 6px 20px rgba(0,0,0,0.5), 0 0 12px rgba(0, 242, 254, 0.3)';
-    el.style.border = '1px solid rgba(255, 255, 255, 0.4)';
+    el.style.boxShadow = '0 8px 26px rgba(0,0,0,0.55), 0 0 16px rgba(0, 242, 254, 0.35)';
+    el.style.border = '1px solid rgba(255, 255, 255, 0.45)';
     
     const zone = this._getSafeZone();
     Object.assign(el.style, zone);
     
-    const effects = ['trigger-bounce-in', 'trigger-zoom-burst', 'trigger-spin-in', 'trigger-shake'];
+    const effects = ['trigger-bounce-in', 'trigger-zoom-burst', 'trigger-spin-in', 'trigger-float-up'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
-    
-    // Легкий наклон
-    const rot = (Math.random() - 0.5) * 12;
-    el.style.transform = `rotate(${rot}deg)`;
+    const floatClass = 'zero-gravity-' + (Math.floor(Math.random() * 4) + 1);
 
     let isFullscreen = false;
     let removeTimeout = null;
@@ -125,13 +137,13 @@ class MediaShow {
       if (removeTimeout) clearTimeout(removeTimeout);
       removeTimeout = setTimeout(() => {
         if (isFullscreen) return;
-        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         el.style.opacity = '0';
-        el.style.transform = `rotate(${rot}deg) scale(0.7)`;
+        el.style.transform = 'scale(0.6)';
         setTimeout(() => { 
           if (el.parentNode) el.remove(); 
           this.activeItems = Math.max(0, this.activeItems - 1); 
-        }, 550);
+        }, 650);
       }, delay);
     };
 
@@ -140,11 +152,12 @@ class MediaShow {
       isFullscreen = !isFullscreen;
       if (isFullscreen) {
         if (removeTimeout) clearTimeout(removeTimeout);
-        el.classList.remove(effect);
+        el.classList.remove(effect, floatClass);
         el.classList.add('media-fullscreen');
       } else {
         el.classList.remove('media-fullscreen');
-        scheduleRemoval(4000);
+        el.classList.add(floatClass);
+        scheduleRemoval(5000);
       }
     });
     
@@ -153,13 +166,21 @@ class MediaShow {
     
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        el.style.transition = 'opacity 0.4s ease';
-        el.style.opacity = '0.92';
+        el.style.transition = 'opacity 0.5s ease';
+        el.style.opacity = '0.94';
         el.classList.add(effect);
+
+        // Переход в плавную невесомость после эффекта появления
+        setTimeout(() => {
+          if (!isFullscreen && el.parentNode) {
+            el.classList.remove(effect);
+            el.classList.add(floatClass);
+          }
+        }, 650);
       });
     });
     
-    const duration = 5000 + Math.random() * 4000;
+    const duration = 6500 + Math.random() * 4500;
     scheduleRemoval(duration);
   }
 
@@ -173,30 +194,33 @@ class MediaShow {
     videoEl.playsInline = true;
     videoEl.loop = true;
     
-    const maxAvailable = Math.min(220, Math.floor(window.innerWidth * 0.42));
-    const size = Math.max(110, maxAvailable);
+    const isMobile = window.innerWidth <= 480;
+    const roll = Math.random();
+    const size = isMobile 
+      ? (roll < 0.5 ? 140 : Math.min(240, Math.floor(window.innerWidth * 0.60)))
+      : (roll < 0.5 ? 180 : 260);
 
     videoEl.style.width = size + 'px';
     videoEl.style.height = size + 'px';
-    videoEl.style.maxWidth = '44vw';
-    videoEl.style.maxHeight = '38vh';
+    videoEl.style.maxWidth = '65vw';
+    videoEl.style.maxHeight = '48vh';
     videoEl.style.objectFit = 'cover';
-    videoEl.style.borderRadius = '10px';
+    videoEl.style.borderRadius = '12px';
     videoEl.style.display = 'block';
-    videoEl.style.boxShadow = '0 6px 20px rgba(0,0,0,0.6)';
-    videoEl.style.border = '1px solid rgba(0, 242, 254, 0.4)';
+    videoEl.style.boxShadow = '0 8px 28px rgba(0,0,0,0.65)';
+    videoEl.style.border = '1px solid rgba(0, 242, 254, 0.45)';
 
     // Кнопка звука
     const muteBtn = document.createElement('button');
     muteBtn.textContent = '🔇';
     muteBtn.style.cssText = `
       position: absolute;
-      bottom: 6px; right: 6px;
-      background: rgba(0,0,0,0.7);
-      border: 1px solid rgba(255,255,255,0.4);
+      bottom: 8px; right: 8px;
+      background: rgba(0,0,0,0.75);
+      border: 1px solid rgba(255,255,255,0.5);
       border-radius: 50%;
-      width: 32px; height: 32px;
-      font-size: 14px;
+      width: 34px; height: 34px;
+      font-size: 15px;
       cursor: pointer;
       color: white;
       display: flex; align-items: center; justify-content: center;
@@ -222,11 +246,9 @@ class MediaShow {
     Object.assign(wrapper.style, zone);
     wrapper.style.opacity = '0';
     
-    const effects = ['trigger-bounce-in', 'trigger-zoom-burst', 'trigger-spin-in', 'trigger-shake'];
+    const effects = ['trigger-bounce-in', 'trigger-zoom-burst', 'trigger-spin-in', 'trigger-float-up'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
-    
-    const rot = (Math.random() - 0.5) * 10;
-    wrapper.style.transform = `rotate(${rot}deg)`;
+    const floatClass = 'zero-gravity-' + (Math.floor(Math.random() * 4) + 1);
     
     wrapper.appendChild(videoEl);
     wrapper.appendChild(muteBtn);
@@ -235,17 +257,24 @@ class MediaShow {
     
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        wrapper.style.transition = 'opacity 0.4s ease';
-        wrapper.style.opacity = '0.95';
+        wrapper.style.transition = 'opacity 0.5s ease';
+        wrapper.style.opacity = '0.96';
         wrapper.classList.add(effect);
+
+        setTimeout(() => {
+          if (wrapper.parentNode) {
+            wrapper.classList.remove(effect);
+            wrapper.classList.add(floatClass);
+          }
+        }, 650);
       });
     });
     
-    const duration = 7000 + Math.random() * 5000;
+    const duration = 8000 + Math.random() * 5000;
     setTimeout(() => {
       wrapper.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
       wrapper.style.opacity = '0';
-      wrapper.style.transform = `rotate(${rot}deg) scale(0.7)`;
+      wrapper.style.transform = 'scale(0.6)';
       setTimeout(() => { 
         if (wrapper.parentNode) wrapper.remove(); 
         this.activeItems = Math.max(0, this.activeItems - 1); 
