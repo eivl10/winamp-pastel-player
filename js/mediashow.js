@@ -81,7 +81,8 @@ class MediaShow {
     el.style.position = 'fixed';
     el.style.zIndex = '50';
     el.style.opacity = '0';
-    el.style.pointerEvents = 'none';
+    el.style.pointerEvents = 'auto';
+    el.style.cursor = 'zoom-in';
     el.style.boxShadow = '0 4px 20px rgba(0,0,0,0.6), 0 0 15px rgba(220,208,255,0.3)';
     
     // Рандомная позиция в четырёх зонах экрана
@@ -104,6 +105,36 @@ class MediaShow {
     // Случайный небольшой поворот
     const rot = (Math.random() - 0.5) * 20;
     el.style.transform = `rotate(${rot}deg)`;
+
+    let isFullscreen = false;
+    let removeTimeout = null;
+
+    const scheduleRemoval = (delay) => {
+      if (removeTimeout) clearTimeout(removeTimeout);
+      removeTimeout = setTimeout(() => {
+        if (isFullscreen) return;
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        el.style.opacity = '0';
+        el.style.transform = `rotate(${rot}deg) scale(0.8)`;
+        setTimeout(() => { 
+          if (el.parentNode) el.remove(); 
+          this.activeItems--; 
+        }, 700);
+      }, delay);
+    };
+
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      isFullscreen = !isFullscreen;
+      if (isFullscreen) {
+        if (removeTimeout) clearTimeout(removeTimeout);
+        el.classList.remove(effect);
+        el.classList.add('media-fullscreen');
+      } else {
+        el.classList.remove('media-fullscreen');
+        scheduleRemoval(4000);
+      }
+    });
     
     this.container.appendChild(el);
     this.activeItems++;
@@ -118,15 +149,7 @@ class MediaShow {
     
     // Автоудаление через 5-9 секунд
     const duration = 5000 + Math.random() * 4000;
-    setTimeout(() => {
-      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      el.style.opacity = '0';
-      el.style.transform = `rotate(${rot}deg) scale(0.8)`;
-      setTimeout(() => { 
-        if (el.parentNode) el.remove(); 
-        this.activeItems--; 
-      }, 700);
-    }, duration);
+    scheduleRemoval(duration);
   }
 
   _showVideo() {

@@ -41,7 +41,19 @@ class TriggerEngine {
       el.style.boxShadow = '0 8px 40px rgba(0,0,0,0.5), 0 0 20px rgba(220,208,255,0.4)';
       el.style.objectFit = 'contain';
       el.style.display = 'block';
-      el.addEventListener('click', () => el.remove());
+      el.style.cursor = 'zoom-in';
+      el.style.pointerEvents = 'auto';
+
+      let isFullscreen = false;
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isFullscreen = !isFullscreen;
+        if (isFullscreen) {
+          el.classList.add('media-fullscreen');
+        } else {
+          el.classList.remove('media-fullscreen');
+        }
+      });
     } else if (trigger.type === 'video') {
       el = document.createElement('video');
       el.src = trigger.src;

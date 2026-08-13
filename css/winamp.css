@@ -471,7 +471,23 @@
   100% { transform: scale(1) rotate(0deg); }
 }
 
-@keyframes track-burst-flash-anim {
-  0%   { opacity: 1; }
-  100% { opacity: 0; }
+/* ===== FULLSCREEN IMAGE ZOOM ===== */
+.media-fullscreen {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 92vw !important;
+  max-height: 85vh !important;
+  object-fit: contain !important;
+  z-index: 99999 !important;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.8), 0 20px 60px rgba(0,0,0,0.9) !important;
+  border-radius: 16px !important;
+  cursor: zoom-out !important;
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
 }
+
