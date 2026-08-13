@@ -209,13 +209,6 @@ function showTrackChangeBurst(track) {
     });
   }
 
-  const btnScreensaver = document.getElementById('btn-screensaver');
-  if (btnScreensaver) {
-    btnScreensaver.addEventListener('click', () => {
-      const mode = screensaver.toggleMode();
-      btnScreensaver.title = mode === 'fast' ? '📺 Быстро' : mode === 'paused' ? '📺 Пауза' : '📺 Норма';
-    });
-  }
 
   const seekBar = document.getElementById('seek-bar');
   if (seekBar) {

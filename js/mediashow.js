@@ -166,30 +166,7 @@ class MediaShow {
       el.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
     };
 
-    // --- Touch события (Палец: перемещение и масштабирование Pinch) ---
-    el.addEventListener('touchstart', (e) => {
-      if (e.target.tagName === 'BUTTON') return;
-      e.stopPropagation(); // Предотвращаем клик сквозь медиа
-      if (e.touches.length === 1) e.preventDefault();
-      
-      freezeFloating();
-
-      if (e.touches.length === 1) {
-        isDragging = true;
-        hasMoved = false;
-        startX = e.touches[0].clientX - posX;
-        startY = e.touches[0].clientY - posY;
-      } else if (e.touches.length === 2) {
-        isDragging = false;
-        initialDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        initialScale = scale;
-      }
-    }, { passive: false });
-
-    window.addEventListener('touchmove', (e) => {
+    const onTouchMove = (e) => {
       if (!isDragging && e.touches.length !== 2) return;
       if (!el.parentNode) return;
 
@@ -214,15 +191,81 @@ class MediaShow {
         scale = Math.max(0.4, Math.min(3.5, initialScale * factor));
         applyTransform();
       }
-    }, { passive: false });
+    };
 
-    window.addEventListener('touchend', (e) => {
+    const onTouchEnd = (e) => {
+      const isFullscreen = el.classList.contains('media-fullscreen');
+      
       if (isDragging && !hasMoved && e.touches.length === 0) {
         // Обычный тап без сдвига -> Fullscreen Toggle
         if (onFullscreenToggle) onFullscreenToggle();
+      } else if (isFullscreen && isDragging && hasMoved && e.touches.length === 0) {
+        // Свайп для закрытия (проверка на большой сдвиг X или Y)
+        if (Math.abs(posX) > 50 || Math.abs(posY) > 50) {
+          if (onFullscreenToggle) onFullscreenToggle();
+        }
+      }
+      
+      if (e.touches.length === 0) {
+        isDragging = false;
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+      }
+    };
+
+    // --- Touch события (Палец: перемещение и масштабирование Pinch) ---
+    el.addEventListener('touchstart', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      e.stopPropagation(); // Предотвращаем клик сквозь медиа
+      if (e.touches.length === 1) e.preventDefault();
+      
+      freezeFloating();
+
+      if (e.touches.length === 1) {
+        isDragging = true;
+        hasMoved = false;
+        startX = e.touches[0].clientX - posX;
+        startY = e.touches[0].clientY - posY;
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        initialDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialScale = scale;
+      }
+      
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchend', onTouchEnd);
+    }, { passive: false });
+
+    const onMouseMove = (e) => {
+      if (!isDragging || !el.parentNode) return;
+      const currentX = e.clientX - startX;
+      const currentY = e.clientY - startY;
+      if (Math.abs(currentX - posX) > 3 || Math.abs(currentY - posY) > 3) {
+        hasMoved = true;
+      }
+      posX = currentX;
+      posY = currentY;
+      applyTransform();
+    };
+
+    const onMouseUp = () => {
+      const isFullscreen = el.classList.contains('media-fullscreen');
+
+      if (isDragging && !hasMoved) {
+        if (onFullscreenToggle) onFullscreenToggle();
+      } else if (isFullscreen && isDragging && hasMoved) {
+        // Свайп (перетаскивание мышью) для закрытия
+        if (Math.abs(posX) > 50 || Math.abs(posY) > 50) {
+          if (onFullscreenToggle) onFullscreenToggle();
+        }
       }
       isDragging = false;
-    });
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
 
     // --- Mouse события (Мышь: Drag и Wheel Scale) ---
     el.addEventListener('mousedown', (e) => {
@@ -234,25 +277,9 @@ class MediaShow {
       hasMoved = false;
       startX = e.clientX - posX;
       startY = e.clientY - posY;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging || !el.parentNode) return;
-      const currentX = e.clientX - startX;
-      const currentY = e.clientY - startY;
-      if (Math.abs(currentX - posX) > 3 || Math.abs(currentY - posY) > 3) {
-        hasMoved = true;
-      }
-      posX = currentX;
-      posY = currentY;
-      applyTransform();
-    });
-
-    window.addEventListener('mouseup', () => {
-      if (isDragging && !hasMoved) {
-        if (onFullscreenToggle) onFullscreenToggle();
-      }
-      isDragging = false;
+      
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
     });
 
     // Колесо мыши для масштабирования
@@ -473,9 +500,17 @@ class MediaShow {
         if (removeTimeout) clearTimeout(removeTimeout);
         wrapper.classList.remove(effect, floatClass);
         wrapper.classList.add('media-fullscreen');
+        videoEl.style.width = '100vw';
+        videoEl.style.height = '100vh';
+        videoEl.style.maxWidth = '92vw';
+        videoEl.style.maxHeight = '85vh';
+        videoEl.style.objectFit = 'contain';
       } else {
         wrapper.classList.remove('media-fullscreen');
         wrapper.classList.add(floatClass);
+        videoEl.style.width = size + 'px';
+        videoEl.style.height = size + 'px';
+        videoEl.style.objectFit = 'cover';
         scheduleRemoval(8000);
       }
     };
