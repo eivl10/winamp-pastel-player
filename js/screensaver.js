@@ -50,8 +50,7 @@ class ScreensaverEngine {
     const clearSize = this.GRID * 2;
     const clearX = (pipe.x * this.GRID + this.GRID / 2) - clearSize / 2;
     const clearY = (pipe.y * this.GRID + this.GRID / 2) - clearSize / 2;
-    this.ctx.fillStyle = 'rgba(248, 251, 252, 0.9)';
-    this.ctx.fillRect(clearX, clearY, clearSize, clearSize);
+    this.ctx.clearRect(clearX, clearY, clearSize, clearSize);
 
     const newPipe = this._createNewPipe();
     Object.assign(pipe, newPipe);

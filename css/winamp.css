@@ -585,3 +585,32 @@
   0%   { opacity: 1; }
   100% { opacity: 0; }
 }
+
+/* ===== MINIMIZED STATE ===== */
+.winamp-window.minimized .winamp-playlist,
+.winamp-window.minimized #volume-slider,
+.winamp-window.minimized #btn-prev,
+.winamp-window.minimized #btn-next,
+.winamp-window.minimized #btn-stop,
+.winamp-window.minimized #btn-shuffle,
+.winamp-window.minimized #btn-screensaver,
+.winamp-window.minimized #duration-display,
+.winamp-window.minimized #bitrate-display {
+  display: none !important;
+}
+
+.winamp-window.minimized .winamp-display {
+  height: auto;
+  padding: 4px;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.winamp-window.minimized .winamp-controls {
+  margin: 0;
+  padding: 4px;
+  justify-content: center;
+}
+

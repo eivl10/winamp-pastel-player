@@ -96,10 +96,20 @@ class AudioEngine {
   nextTrack() {
     if (!this.tracks.length) return;
     let nextIndex;
+    
     if (this.isShuffled && this.tracks.length > 1) {
-      do {
-        nextIndex = Math.floor(Math.random() * this.tracks.length);
-      } while (nextIndex === this.currentIndex);
+      if (!this.shuffledIndices || this.shuffledIndices.length === 0) {
+        this.shuffledIndices = [];
+        for (let i = 0; i < this.tracks.length; i++) {
+          if (i !== this.currentIndex) this.shuffledIndices.push(i);
+        }
+        // Fisher-Yates shuffle
+        for (let i = this.shuffledIndices.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [this.shuffledIndices[i], this.shuffledIndices[j]] = [this.shuffledIndices[j], this.shuffledIndices[i]];
+        }
+      }
+      nextIndex = this.shuffledIndices.pop();
     } else {
       nextIndex = (this.currentIndex + 1) % this.tracks.length;
     }
@@ -120,6 +130,9 @@ class AudioEngine {
 
   toggleShuffle() {
     this.isShuffled = !this.isShuffled;
+    if (this.isShuffled) {
+      this.shuffledIndices = []; // Reset sequence when turning on
+    }
     return this.isShuffled;
   }
 

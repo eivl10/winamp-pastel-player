@@ -46,14 +46,12 @@ function showTrackChangeBurst(track) {
   }, 2200);
 }
 
-  // 1. Load tracks.json
+  // 1. Load tracks.js
   let tracks = [];
-  try {
-    const res = await fetch('data/tracks.json');
-    const data = await res.json();
-    tracks = Array.isArray(data) ? data : (data.tracks || []);
-  } catch (err) {
-    console.error('Failed to load tracks.json:', err);
+  if (typeof TRACKS_DATA !== 'undefined') {
+    tracks = Array.isArray(TRACKS_DATA) ? TRACKS_DATA : (TRACKS_DATA.tracks || []);
+  } else {
+    console.error('TRACKS_DATA is not defined. Ensure js/tracks.js is loaded.');
   }
 
   // 2. Initialize engines
@@ -332,14 +330,40 @@ function showTrackChangeBurst(track) {
       playPromise.catch(() => {
         const startOnUserAction = () => {
           engine.play();
-          window.removeEventListener('click', startOnUserAction);
-          window.removeEventListener('touchstart', startOnUserAction);
+          document.removeEventListener('click', startOnUserAction, true);
+          document.removeEventListener('touchstart', startOnUserAction, true);
         };
-        window.addEventListener('click', startOnUserAction, { once: true });
-        window.addEventListener('touchstart', startOnUserAction, { once: true });
+        document.addEventListener('click', startOnUserAction, { once: true, capture: true });
+        document.addEventListener('touchstart', startOnUserAction, { once: true, capture: true });
       });
     }
   }
 
-  startApp();
+  // --- Splash Screen Logic ---
+  const splashScreen = document.getElementById('splash-screen');
+  const splashBtn = document.getElementById('btn-splash-hello');
+  const fireworksContainer = document.querySelector('.fireworks-container');
+
+  // Generate fireworks
+  if (fireworksContainer) {
+    for (let i = 0; i < 20; i++) {
+      const fw = document.createElement('div');
+      fw.className = 'firework';
+      fw.style.left = Math.random() * 100 + '%';
+      fw.style.top = Math.random() * 100 + '%';
+      fw.style.animationDelay = (Math.random() * 2) + 's';
+      fireworksContainer.appendChild(fw);
+    }
+  }
+
+  if (splashScreen && splashBtn) {
+    splashBtn.addEventListener('click', () => {
+      splashScreen.classList.add('hidden');
+      startApp();
+      // Remove splash from DOM after transition
+      setTimeout(() => splashScreen.remove(), 1000);
+    });
+  } else {
+    startApp();
+  }
 });

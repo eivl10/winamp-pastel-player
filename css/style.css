@@ -175,3 +175,95 @@ input[type=range]::-webkit-slider-runnable-track {
   z-index: 500 !important;
   pointer-events: none;
 }
+
+/* ===== SPLASH SCREEN ===== */
+.splash-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 10000;
+  background: radial-gradient(circle at center, #2b1055 0%, #000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1s ease-in-out, visibility 1s;
+  overflow: hidden;
+}
+
+.splash-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-content {
+  text-align: center;
+  z-index: 2;
+}
+
+.floating-splash {
+  animation: float-splash 4s ease-in-out infinite;
+}
+
+@keyframes float-splash {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.splash-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 32px;
+  color: #fff;
+  text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
+  margin-bottom: 30px;
+}
+
+.splash-btn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 24px;
+  padding: 12px 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #00ffff;
+  color: #00ffff;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  transition: all 0.3s;
+}
+
+.splash-btn:hover {
+  background: #00ffff;
+  color: #000;
+  box-shadow: 0 0 30px #00ffff;
+}
+
+/* Fireworks CSS particles */
+.fireworks-container {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.firework {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  animation: explode 1.5s ease-out infinite;
+}
+
+@keyframes explode {
+  0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 #fff; }
+  100% { transform: scale(1); opacity: 0; box-shadow: 
+    -40px -40px 0 0px #ff00ff,
+    40px -40px 0 0px #00ffff,
+    -40px 40px 0 0px #ffff00,
+    40px 40px 0 0px #ff0000,
+    0px -50px 0 0px #00ff00,
+    0px 50px 0 0px #0000ff,
+    -50px 0px 0 0px #ff00ff,
+    50px 0px 0 0px #00ffff;
+  }
+}

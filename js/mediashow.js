@@ -10,7 +10,11 @@ const MEDIA_IMAGES = [
   'assets/images/плащ.webp',
   'assets/images/фрукты.webp',
   'assets/images/хуля и мы.webp',
-  'assets/images/хуля.webp'
+  'assets/images/хуля.webp',
+  'assets/images/дома.webp',
+  'assets/images/ланка.webp',
+  'assets/images/храм.webp',
+  'assets/images/ы.webp'
 ];
 
 const MEDIA_VIDEOS = [
@@ -18,7 +22,9 @@ const MEDIA_VIDEOS = [
   'assets/videos/круг2.mp4',
   'assets/videos/кружок1.mp4',
   'assets/videos/обнимахи.mp4',
-  'assets/videos/шаги.mp4'
+  'assets/videos/шаги.mp4',
+  'assets/videos/поезд.mp4',
+  'assets/videos/чотаэ.mp4'
 ];
 
 const ALL_EMOJIS = ['🌹', '💃', '✨', '🔥', '🎺', '🐸', '👑', '🌟', '💫', '🌊', '🦀', '🍍', '🍰', '🌈'];
@@ -41,6 +47,25 @@ class MediaShow {
     this.MAX_ITEMS = 3;
     this.speedLevel = 2; // По умолчанию уровень 2 (редко)
     this.enabled = true;
+    this.totalShown = 0;
+    this.specialVideoShown = false;
+    this._preloadAssets();
+  }
+
+  _preloadAssets() {
+    // Preload images
+    MEDIA_IMAGES.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+    // Preload videos
+    MEDIA_VIDEOS.forEach(src => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'video';
+      link.href = src;
+      document.head.appendChild(link);
+    });
   }
 
   setSpeed(level) {
@@ -91,6 +116,13 @@ class MediaShow {
   _showNext() {
     if (!this.running || this.activeItems >= this.MAX_ITEMS) return;
     
+    this.totalShown++;
+    if (this.totalShown >= 10 && !this.specialVideoShown) {
+      this.specialVideoShown = true;
+      this._showVideo('assets/videos/bolshoe.mp4');
+      return;
+    }
+    
     const roll = Math.random();
     if (roll < 0.65) {
       this._showImage();
@@ -137,6 +169,9 @@ class MediaShow {
     // --- Touch события (Палец: перемещение и масштабирование Pinch) ---
     el.addEventListener('touchstart', (e) => {
       if (e.target.tagName === 'BUTTON') return;
+      e.stopPropagation(); // Предотвращаем клик сквозь медиа
+      if (e.touches.length === 1) e.preventDefault();
+      
       freezeFloating();
 
       if (e.touches.length === 1) {
@@ -193,6 +228,7 @@ class MediaShow {
     el.addEventListener('mousedown', (e) => {
       if (e.target.tagName === 'BUTTON') return;
       e.preventDefault();
+      e.stopPropagation(); // Предотвращаем клик сквозь медиа
       freezeFloating();
       isDragging = true;
       hasMoved = false;
@@ -242,12 +278,12 @@ class MediaShow {
     const isMobile = window.innerWidth <= 480;
     
     if (roll < 0.25) {
-      size = isMobile ? (80 + Math.floor(Math.random() * 30)) : (110 + Math.floor(Math.random() * 40)); // маленький
+      size = isMobile ? (60 + Math.floor(Math.random() * 20)) : (80 + Math.floor(Math.random() * 20)); // маленький
     } else if (roll < 0.65) {
-      size = isMobile ? (140 + Math.floor(Math.random() * 45)) : (180 + Math.floor(Math.random() * 60)); // средний
+      size = isMobile ? (100 + Math.floor(Math.random() * 30)) : (120 + Math.floor(Math.random() * 30)); // средний
     } else {
       // КРУПНЫЙ размер (впечатляющий вид)
-      size = isMobile ? Math.min(270, Math.floor(window.innerWidth * 0.68)) : (280 + Math.floor(Math.random() * 90));
+      size = isMobile ? Math.min(160, Math.floor(window.innerWidth * 0.45)) : (180 + Math.floor(Math.random() * 40));
     }
 
     el.style.width = size + 'px';
@@ -258,7 +294,13 @@ class MediaShow {
     el.style.borderRadius = '14px';
     el.style.position = 'fixed';
     el.style.zIndex = '150';
-    el.style.opacity = '1'; // 100% сплошная непрозрачность
+    el.style.opacity = '0'; // Скрыто до загрузки
+    el.style.transition = 'opacity 0.6s ease-out';
+    if (el.complete) {
+      el.style.opacity = '1';
+    } else {
+      el.onload = () => { el.style.opacity = '1'; };
+    }
     el.style.background = '#000000';
     el.style.pointerEvents = 'auto';
     el.style.cursor = 'grab';
@@ -308,7 +350,7 @@ class MediaShow {
     this.container.appendChild(el);
     this.activeItems++;
     
-    requestAnimationFrame(() => {
+    const triggerEffect = () => {
       requestAnimationFrame(() => {
         el.style.opacity = '1';
         el.classList.add(effect);
@@ -320,14 +362,20 @@ class MediaShow {
           }
         }, 650);
       });
-    });
+    };
+
+    if (el.complete) {
+      triggerEffect();
+    } else {
+      el.addEventListener('load', triggerEffect);
+    }
     
     const duration = 12000 + Math.random() * 8000;
     scheduleRemoval(duration);
   }
 
-  _showVideo() {
-    const src = MEDIA_VIDEOS[Math.floor(Math.random() * MEDIA_VIDEOS.length)];
+  _showVideo(srcOverride) {
+    const src = srcOverride || MEDIA_VIDEOS[Math.floor(Math.random() * MEDIA_VIDEOS.length)];
     
     const videoEl = document.createElement('video');
     videoEl.src = src;
@@ -339,8 +387,8 @@ class MediaShow {
     const isMobile = window.innerWidth <= 480;
     const roll = Math.random();
     const size = isMobile 
-      ? (roll < 0.5 ? 150 : Math.min(260, Math.floor(window.innerWidth * 0.65)))
-      : (roll < 0.5 ? 190 : 280);
+      ? (roll < 0.5 ? 110 : Math.min(160, Math.floor(window.innerWidth * 0.40)))
+      : (roll < 0.5 ? 130 : 190);
 
     videoEl.style.width = size + 'px';
     videoEl.style.height = size + 'px';
@@ -386,7 +434,8 @@ class MediaShow {
       display: inline-block;
       cursor: grab;
       touch-action: none;
-      opacity: 1;
+      opacity: 0;
+      transition: opacity 0.8s ease-out;
       background: #000000;
       border-radius: 14px;
     `;
@@ -436,7 +485,7 @@ class MediaShow {
     this.container.appendChild(wrapper);
     this.activeItems++;
     
-    requestAnimationFrame(() => {
+    const triggerEffect = () => {
       requestAnimationFrame(() => {
         wrapper.style.opacity = '1';
         wrapper.classList.add(effect);
@@ -448,7 +497,13 @@ class MediaShow {
           }
         }, 650);
       });
-    });
+    };
+
+    if (videoEl.readyState >= 3) {
+      triggerEffect();
+    } else {
+      videoEl.addEventListener('loadeddata', triggerEffect);
+    }
     
     const duration = 14000 + Math.random() * 8000;
     scheduleRemoval(duration);

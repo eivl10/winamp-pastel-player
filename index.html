@@ -11,6 +11,16 @@
 </head>
 <body>
 
+  <!-- Splash Screen -->
+  <div id="splash-screen" class="splash-screen">
+    <div class="splash-content floating-splash">
+      <h1 class="splash-title">Ну здравствуй, Ира!</h1>
+      <button id="btn-splash-hello" class="splash-btn">Привет</button>
+    </div>
+    <!-- Fireworks container -->
+    <div class="fireworks-container"></div>
+  </div>
+
   <!-- Blob Background (Kosmosky style) -->
   <div class="blob-bg">
     <div class="blob blob-1"></div>
@@ -20,7 +30,7 @@
 
   <!-- Main Player Container -->
   <div id="app">
-    <div class="winamp-window" id="winamp-window">
+    <div class="winamp-window minimized" id="winamp-window">
       <!-- Titlebar with Large Minimize Button -->
       <div class="winamp-titlebar">
         <span class="winamp-title">WINAMP</span>
@@ -95,6 +105,7 @@
   </div>
 
   <!-- Scripts -->
+  <script src="js/tracks.js"></script>
   <script src="js/player.js"></script>
   <script src="js/triggers.js"></script>
   <script src="js/screensaver.js"></script>
