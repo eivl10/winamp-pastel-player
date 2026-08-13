@@ -97,18 +97,6 @@
   },
   {
     "id": "track-09",
-    "title": "Люди, люди",
-    "artist": "Алла Пугачёва",
-    "url": "assets/audio/Alla_Pugacheva_-_7._Lyudi_lyudi_A._Pugacheva_-_I._Reznik__(SkySound7.com).mp3",
-    "triggers": [
-      { "time": 10, "type": "popup", "content": "👀 ЛЮДИ ЛЮДИ ЛЮДИ", "effect": "glitch", "position": "bottom-right", "duration": 5 },
-      { "time": 45, "type": "image", "src": "assets/images/мася.jpg", "effect": "bounce", "position": "top-right", "duration": 4 },
-      { "time": 75, "type": "emoji-shower", "emojis": ["👥", "👀", "🗣️"], "duration": 4 },
-      { "time": 115, "type": "video", "src": "assets/videos/кружок1.mp4", "effect": "fade-in", "position": "center", "duration": 9 }
-    ]
-  },
-  {
-    "id": "track-10",
     "title": "Усталость",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugachyova_-_Ustalost_1982_(SkySound7.com).mp3",
@@ -120,7 +108,7 @@
     ]
   },
   {
-    "id": "track-11",
+    "id": "track-10",
     "title": "Я больше не ревную",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/1981_Alla_Pugacheva_-_YA_bolshe_ne_revnuyu_(SkySound7.com).mp3",
@@ -132,7 +120,7 @@
     ]
   },
   {
-    "id": "track-12",
+    "id": "track-11",
     "title": "Миллион роз",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugachyova_-_Million_roz_(SkySound7.com).mp3",
@@ -144,7 +132,7 @@
     ]
   },
   {
-    "id": "track-13",
+    "id": "track-12",
     "title": "Расскажите птицы",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/RASSKAZHITE_PTICY_-_PUGACHYOVA_(SkySound7.com).mp3",
@@ -156,7 +144,7 @@
     ]
   },
   {
-    "id": "track-14",
+    "id": "track-13",
     "title": "Самолёты улетают",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugachyova_-_Samolety_uletayut_(SkySound7.com).mp3",
@@ -168,7 +156,7 @@
     ]
   },
   {
-    "id": "track-15",
+    "id": "track-14",
     "title": "Озеро надежды",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugacheva_-_Ozero_Nadezhdy_(SkySound7.com).mp3",
@@ -180,7 +168,7 @@
     ]
   },
   {
-    "id": "track-16",
+    "id": "track-15",
     "title": "Свеча горела на столе",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/7.Alla_Pugacheva_-_Svecha_gorela_na_stole_(SkySound7.com).mp3",
@@ -192,7 +180,7 @@
     ]
   },
   {
-    "id": "track-17",
+    "id": "track-16",
     "title": "Этот мир придуман не мною",
     "artist": "Алла Пугачёва",
     "url": "assets/audio/Alla_Pugacheva_-_Etot_mir_priduman_ne_mnoyu_(SkySound7.com).mp3",
