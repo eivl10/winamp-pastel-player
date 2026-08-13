@@ -5,15 +5,20 @@ const MEDIA_IMAGES = [
   'assets/images/перцы.jpg',
   'assets/images/плащ.jpg',
   'assets/images/фрукты.jpg',
-  'assets/images/хуля.webp'
-  // Добавь сюда новые файлы через пробел, массив автоматически расширяется
-  // 'assets/images/photo-new.jpg',
+  'assets/images/хуля.webp',
+  'assets/images/photo_2026-08-13_19-51-07.jpg',
+  'assets/images/ирка.jpg',
+  'assets/images/мася хуля.jpg',
+  'assets/images/плащ 2.jpg',
+  'assets/images/хуля и мы.jpg'
 ];
 
 const MEDIA_VIDEOS = [
   'assets/videos/кружок1.mp4',
   'assets/videos/круг2.mp4',
-  'assets/videos/круг 3.mp4'
+  'assets/videos/круг 3.mp4',
+  'assets/videos/обнимахи.MOV',
+  'assets/videos/шаги.MOV'
 ];
 
 const ALL_EMOJIS = ['🌹', '💃', '✨', '🔥', '🎺', '🐸', '👑', '🌟', '💫', '🌊', '🦀', '🍍', '🍰', '🌈'];

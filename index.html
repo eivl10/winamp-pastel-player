@@ -2,13 +2,12 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Winamp Pastel Player</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/winamp.css">
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
 
@@ -17,11 +16,6 @@
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
-  </div>
-
-  <!-- iOS Unlock Screen -->
-  <div id="ios-unlock-screen" style="display: none;">
-    <button id="ios-start-btn">Нажми чтобы начать ▶</button>
   </div>
 
   <!-- Main Player Container -->
@@ -50,7 +44,7 @@
       <div class="winamp-controls">
         <button id="btn-prev" title="Previous">⏮</button>
         <button id="btn-play" title="Play">▶</button>
-        <button id="btn-pause" title="Pause">⏸</button>
+        <button id="btn-pause" title="Pause" style="display:none;">⏸</button>
         <button id="btn-stop" title="Stop">⏹</button>
         <button id="btn-next" title="Next">⏭</button>
         <button id="btn-shuffle" title="Shuffle">🔀</button>
@@ -74,17 +68,14 @@
     </div>
   </div>
 
-  <div id="mediashow-layer" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 50; pointer-events: none;"></div>
-
-  <!-- Media Overlay for Triggers -->
-  <div id="media-overlay" style="position: fixed; z-index: 500;"></div>
-
-  <!-- Screensaver Overlay -->
-  <div id="screensaver-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; background: transparent;">
-    <canvas id="screensaver-canvas" style="width:100%;height:100%;"></canvas>
+  <!-- Dynamic Layers -->
+  <div id="mediashow-layer"></div>
+  <div id="media-overlay"></div>
+  <div id="screensaver-overlay">
+    <canvas id="screensaver-canvas"></canvas>
   </div>
 
-  <!-- JavaScript Scripts -->
+  <!-- Scripts -->
   <script src="js/player.js"></script>
   <script src="js/triggers.js"></script>
   <script src="js/screensaver.js"></script>

@@ -285,11 +285,5 @@ function showTrackChangeBurst(track) {
     }
   }
 
-  setupIOSUnlock(engine, () => {
-    startApp();
-  });
-
-  if (!/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    startApp();
-  }
+  startApp();
 });
