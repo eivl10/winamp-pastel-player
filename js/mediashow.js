@@ -23,15 +23,40 @@ const MEDIA_VIDEOS = [
 
 const ALL_EMOJIS = ['🌹', '💃', '✨', '🔥', '🎺', '🐸', '👑', '🌟', '💫', '🌊', '🦀', '🍍', '🍰', '🌈'];
 
+// Скорости появления медиа (1-5)
+const SPEED_INTERVALS = {
+  1: 14000, // Очень редко
+  2: 9000,  // Редко (по умолчанию)
+  3: 5500,  // Средне
+  4: 3200,  // Быстро
+  5: 1600   // Турбо
+};
+
 class MediaShow {
   constructor(containerEl) {
     this.container = containerEl; // #mediashow-layer
     this.running = false;
     this.interval = null;
     this.activeItems = 0;
-    this.MAX_ITEMS = 4;
-    this.MIN_INTERVAL = 3000; // каждые 3 сек
+    this.MAX_ITEMS = 3;
+    this.speedLevel = 2; // По умолчанию уровень 2 (редко)
     this.enabled = true;
+  }
+
+  setSpeed(level) {
+    this.speedLevel = Math.max(1, Math.min(5, level));
+    if (this.running && this.enabled) {
+      if (this.interval) clearInterval(this.interval);
+      const intervalMs = SPEED_INTERVALS[this.speedLevel] || 9000;
+      this.interval = setInterval(() => this._showNext(), intervalMs);
+    }
+    return this.speedLevel;
+  }
+
+  cycleSpeed() {
+    let nextLevel = this.speedLevel + 1;
+    if (nextLevel > 5) nextLevel = 1;
+    return this.setSpeed(nextLevel);
   }
 
   toggle(enable) {
@@ -49,7 +74,8 @@ class MediaShow {
     this.running = true;
     this._showNext();
     if (this.interval) clearInterval(this.interval);
-    this.interval = setInterval(() => this._showNext(), this.MIN_INTERVAL);
+    const intervalMs = SPEED_INTERVALS[this.speedLevel] || 9000;
+    this.interval = setInterval(() => this._showNext(), intervalMs);
   }
 
   stop() {
@@ -77,16 +103,131 @@ class MediaShow {
 
   _getSafeZone() {
     const zones = [
-      { top: '10px', left: '10px' },
-      { top: '10px', right: '10px' },
-      { bottom: '70px', left: '10px' },
-      { bottom: '70px', right: '10px' },
-      { top: '35%', left: '8px' },
-      { top: '35%', right: '8px' },
-      { top: '55%', left: '12px' },
-      { top: '55%', right: '12px' }
+      { top: '16px', left: '14px' },
+      { top: '16px', right: '14px' },
+      { bottom: '80px', left: '14px' },
+      { bottom: '80px', right: '14px' },
+      { top: '38%', left: '10px' },
+      { top: '38%', right: '10px' },
+      { top: '56%', left: '14px' },
+      { top: '56%', right: '14px' }
     ];
     return zones[Math.floor(Math.random() * zones.length)];
+  }
+
+  _attachDragAndScale(el, onFullscreenToggle) {
+    let posX = 0, posY = 0, scale = 1.0;
+    let startX = 0, startY = 0;
+    let isDragging = false;
+    let hasMoved = false;
+    let initialDistance = 0;
+    let initialScale = 1.0;
+
+    // Остановка плавания при ручном взаимодействии
+    const freezeFloating = () => {
+      el.classList.remove('zero-gravity-1', 'zero-gravity-2', 'zero-gravity-3', 'zero-gravity-4');
+      el.style.animation = 'none';
+      el.style.zIndex = '300';
+    };
+
+    const applyTransform = () => {
+      el.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+    };
+
+    // --- Touch события (Палец: перемещение и масштабирование Pinch) ---
+    el.addEventListener('touchstart', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      freezeFloating();
+
+      if (e.touches.length === 1) {
+        isDragging = true;
+        hasMoved = false;
+        startX = e.touches[0].clientX - posX;
+        startY = e.touches[0].clientY - posY;
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        initialDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialScale = scale;
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDragging && e.touches.length !== 2) return;
+      if (!el.parentNode) return;
+
+      if (isDragging && e.touches.length === 1) {
+        const currentX = e.touches[0].clientX - startX;
+        const currentY = e.touches[0].clientY - startY;
+        if (Math.abs(currentX - posX) > 4 || Math.abs(currentY - posY) > 4) {
+          hasMoved = true;
+          e.preventDefault();
+        }
+        posX = currentX;
+        posY = currentY;
+        applyTransform();
+      } else if (e.touches.length === 2 && initialDistance > 0) {
+        e.preventDefault();
+        hasMoved = true;
+        const currentDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const factor = currentDist / initialDistance;
+        scale = Math.max(0.4, Math.min(3.5, initialScale * factor));
+        applyTransform();
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+      if (isDragging && !hasMoved && e.touches.length === 0) {
+        // Обычный тап без сдвига -> Fullscreen Toggle
+        if (onFullscreenToggle) onFullscreenToggle();
+      }
+      isDragging = false;
+    });
+
+    // --- Mouse события (Мышь: Drag и Wheel Scale) ---
+    el.addEventListener('mousedown', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      e.preventDefault();
+      freezeFloating();
+      isDragging = true;
+      hasMoved = false;
+      startX = e.clientX - posX;
+      startY = e.clientY - posY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging || !el.parentNode) return;
+      const currentX = e.clientX - startX;
+      const currentY = e.clientY - startY;
+      if (Math.abs(currentX - posX) > 3 || Math.abs(currentY - posY) > 3) {
+        hasMoved = true;
+      }
+      posX = currentX;
+      posY = currentY;
+      applyTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDragging && !hasMoved) {
+        if (onFullscreenToggle) onFullscreenToggle();
+      }
+      isDragging = false;
+    });
+
+    // Колесо мыши для масштабирования
+    el.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      freezeFloating();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      scale = Math.max(0.4, Math.min(3.5, scale + delta));
+      applyTransform();
+    }, { passive: false });
   }
 
   _showImage() {
@@ -95,33 +236,35 @@ class MediaShow {
     const el = document.createElement('img');
     el.src = src;
     
-    // Случайный размер: от компактного до крупного (в невесомости)
+    // Случайный размер: от компактного до крупного
     const roll = Math.random();
     let size;
     const isMobile = window.innerWidth <= 480;
     
     if (roll < 0.25) {
-      size = isMobile ? (75 + Math.floor(Math.random() * 30)) : (100 + Math.floor(Math.random() * 40)); // маленький
+      size = isMobile ? (80 + Math.floor(Math.random() * 30)) : (110 + Math.floor(Math.random() * 40)); // маленький
     } else if (roll < 0.65) {
-      size = isMobile ? (130 + Math.floor(Math.random() * 45)) : (170 + Math.floor(Math.random() * 60)); // средний
+      size = isMobile ? (140 + Math.floor(Math.random() * 45)) : (180 + Math.floor(Math.random() * 60)); // средний
     } else {
       // КРУПНЫЙ размер (впечатляющий вид)
-      size = isMobile ? Math.min(260, Math.floor(window.innerWidth * 0.65)) : (270 + Math.floor(Math.random() * 90));
+      size = isMobile ? Math.min(270, Math.floor(window.innerWidth * 0.68)) : (280 + Math.floor(Math.random() * 90));
     }
 
     el.style.width = size + 'px';
     el.style.height = size + 'px';
-    el.style.maxWidth = '68vw';
-    el.style.maxHeight = '48vh';
+    el.style.maxWidth = '72vw';
+    el.style.maxHeight = '52vh';
     el.style.objectFit = 'cover';
     el.style.borderRadius = '14px';
     el.style.position = 'fixed';
     el.style.zIndex = '150';
-    el.style.opacity = '0';
+    el.style.opacity = '1'; // 100% сплошная непрозрачность
+    el.style.background = '#000000';
     el.style.pointerEvents = 'auto';
-    el.style.cursor = 'zoom-in';
-    el.style.boxShadow = '0 8px 26px rgba(0,0,0,0.55), 0 0 16px rgba(0, 242, 254, 0.35)';
-    el.style.border = '1px solid rgba(255, 255, 255, 0.45)';
+    el.style.cursor = 'grab';
+    el.style.touchAction = 'none'; // для плавного touch drag
+    el.style.boxShadow = '0 8px 28px rgba(0,0,0,0.65), 0 0 16px rgba(0, 242, 254, 0.4)';
+    el.style.border = '2px solid rgba(255, 255, 255, 0.6)';
     
     const zone = this._getSafeZone();
     Object.assign(el.style, zone);
@@ -139,7 +282,7 @@ class MediaShow {
         if (isFullscreen) return;
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         el.style.opacity = '0';
-        el.style.transform = 'scale(0.6)';
+        el.style.transform = 'scale(0.5)';
         setTimeout(() => { 
           if (el.parentNode) el.remove(); 
           this.activeItems = Math.max(0, this.activeItems - 1); 
@@ -147,8 +290,7 @@ class MediaShow {
       }, delay);
     };
 
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
+    const toggleFullscreen = () => {
       isFullscreen = !isFullscreen;
       if (isFullscreen) {
         if (removeTimeout) clearTimeout(removeTimeout);
@@ -157,20 +299,20 @@ class MediaShow {
       } else {
         el.classList.remove('media-fullscreen');
         el.classList.add(floatClass);
-        scheduleRemoval(5000);
+        scheduleRemoval(8000);
       }
-    });
+    };
+
+    this._attachDragAndScale(el, toggleFullscreen);
     
     this.container.appendChild(el);
     this.activeItems++;
     
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        el.style.transition = 'opacity 0.5s ease';
-        el.style.opacity = '0.94';
+        el.style.opacity = '1';
         el.classList.add(effect);
 
-        // Переход в плавную невесомость после эффекта появления
         setTimeout(() => {
           if (!isFullscreen && el.parentNode) {
             el.classList.remove(effect);
@@ -180,7 +322,7 @@ class MediaShow {
       });
     });
     
-    const duration = 6500 + Math.random() * 4500;
+    const duration = 12000 + Math.random() * 8000;
     scheduleRemoval(duration);
   }
 
@@ -197,18 +339,20 @@ class MediaShow {
     const isMobile = window.innerWidth <= 480;
     const roll = Math.random();
     const size = isMobile 
-      ? (roll < 0.5 ? 140 : Math.min(240, Math.floor(window.innerWidth * 0.60)))
-      : (roll < 0.5 ? 180 : 260);
+      ? (roll < 0.5 ? 150 : Math.min(260, Math.floor(window.innerWidth * 0.65)))
+      : (roll < 0.5 ? 190 : 280);
 
     videoEl.style.width = size + 'px';
     videoEl.style.height = size + 'px';
-    videoEl.style.maxWidth = '65vw';
-    videoEl.style.maxHeight = '48vh';
+    videoEl.style.maxWidth = '70vw';
+    videoEl.style.maxHeight = '52vh';
     videoEl.style.objectFit = 'cover';
-    videoEl.style.borderRadius = '12px';
+    videoEl.style.borderRadius = '14px';
     videoEl.style.display = 'block';
-    videoEl.style.boxShadow = '0 8px 28px rgba(0,0,0,0.65)';
-    videoEl.style.border = '1px solid rgba(0, 242, 254, 0.45)';
+    videoEl.style.background = '#000000';
+    videoEl.style.opacity = '1'; // 100% сплошная непрозрачность
+    videoEl.style.boxShadow = '0 8px 30px rgba(0,0,0,0.7)';
+    videoEl.style.border = '2px solid rgba(0, 242, 254, 0.6)';
 
     // Кнопка звука
     const muteBtn = document.createElement('button');
@@ -216,15 +360,15 @@ class MediaShow {
     muteBtn.style.cssText = `
       position: absolute;
       bottom: 8px; right: 8px;
-      background: rgba(0,0,0,0.75);
-      border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(0,0,0,0.85);
+      border: 1px solid rgba(255,255,255,0.6);
       border-radius: 50%;
-      width: 34px; height: 34px;
-      font-size: 15px;
+      width: 36px; height: 36px;
+      font-size: 16px;
       cursor: pointer;
       color: white;
       display: flex; align-items: center; justify-content: center;
-      z-index: 2;
+      z-index: 20;
       pointer-events: auto;
       transition: transform 0.15s;
     `;
@@ -240,11 +384,15 @@ class MediaShow {
       z-index: 155;
       pointer-events: auto;
       display: inline-block;
+      cursor: grab;
+      touch-action: none;
+      opacity: 1;
+      background: #000000;
+      border-radius: 14px;
     `;
     
     const zone = this._getSafeZone();
     Object.assign(wrapper.style, zone);
-    wrapper.style.opacity = '0';
     
     const effects = ['trigger-bounce-in', 'trigger-zoom-burst', 'trigger-spin-in', 'trigger-float-up'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
@@ -252,13 +400,45 @@ class MediaShow {
     
     wrapper.appendChild(videoEl);
     wrapper.appendChild(muteBtn);
+
+    let isFullscreen = false;
+    let removeTimeout = null;
+
+    const scheduleRemoval = (delay) => {
+      if (removeTimeout) clearTimeout(removeTimeout);
+      removeTimeout = setTimeout(() => {
+        if (isFullscreen) return;
+        wrapper.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        wrapper.style.opacity = '0';
+        wrapper.style.transform = 'scale(0.5)';
+        setTimeout(() => { 
+          if (wrapper.parentNode) wrapper.remove(); 
+          this.activeItems = Math.max(0, this.activeItems - 1); 
+        }, 650);
+      }, delay);
+    };
+
+    const toggleFullscreen = () => {
+      isFullscreen = !isFullscreen;
+      if (isFullscreen) {
+        if (removeTimeout) clearTimeout(removeTimeout);
+        wrapper.classList.remove(effect, floatClass);
+        wrapper.classList.add('media-fullscreen');
+      } else {
+        wrapper.classList.remove('media-fullscreen');
+        wrapper.classList.add(floatClass);
+        scheduleRemoval(8000);
+      }
+    };
+
+    this._attachDragAndScale(wrapper, toggleFullscreen);
+
     this.container.appendChild(wrapper);
     this.activeItems++;
     
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        wrapper.style.transition = 'opacity 0.5s ease';
-        wrapper.style.opacity = '0.96';
+        wrapper.style.opacity = '1';
         wrapper.classList.add(effect);
 
         setTimeout(() => {
@@ -270,16 +450,8 @@ class MediaShow {
       });
     });
     
-    const duration = 8000 + Math.random() * 5000;
-    setTimeout(() => {
-      wrapper.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      wrapper.style.opacity = '0';
-      wrapper.style.transform = 'scale(0.6)';
-      setTimeout(() => { 
-        if (wrapper.parentNode) wrapper.remove(); 
-        this.activeItems = Math.max(0, this.activeItems - 1); 
-      }, 650);
-    }, duration);
+    const duration = 14000 + Math.random() * 8000;
+    scheduleRemoval(duration);
   }
 
   _showEmojiShower() {
@@ -297,7 +469,7 @@ class MediaShow {
         span.style.position = 'fixed';
         span.style.left = (Math.random() * 86 + 6) + 'vw';
         span.style.top = '-40px';
-        span.style.fontSize = (18 + Math.random() * 24) + 'px';
+        span.style.fontSize = (20 + Math.random() * 24) + 'px';
         span.style.zIndex = '500';
         span.style.pointerEvents = 'none';
         span.style.animation = `trigger-confetti-fall ${1.5 + Math.random() * 2.0}s ease-in forwards`;

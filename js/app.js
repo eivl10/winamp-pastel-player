@@ -303,6 +303,18 @@ function showTrackChangeBurst(track) {
     });
   }
 
+  const toggleSpeed = document.getElementById('toggle-speed');
+  const speedLevelText = document.getElementById('speed-level');
+  if (toggleSpeed) {
+    toggleSpeed.addEventListener('click', () => {
+      if (mediaShow) {
+        const newLevel = mediaShow.cycleSpeed();
+        if (speedLevelText) speedLevelText.textContent = newLevel;
+        toggleSpeed.title = `Скорость появления медиа: ${newLevel}/5`;
+      }
+    });
+  }
+
   // 6. Initialization Logic
   let isAppInitialized = false;
   function startApp() {
