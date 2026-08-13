@@ -165,6 +165,15 @@ function showTrackChangeBurst(track) {
     if (btnPlay) {
       btnPlay.classList.toggle('active', state === 'playing');
     }
+    
+    // Управляем пульсацией логотипа
+    const titlebar = document.querySelector('.winamp-titlebar');
+    if (titlebar) titlebar.classList.toggle('is-playing', state === 'playing');
+    
+    // Управляем EQ-барами
+    const eqBars = document.getElementById('eq-bars');
+    if (eqBars) eqBars.classList.toggle('playing', state === 'playing');
+    
     // Пауза/возобновление mediashow
     if (mediaShow) {
       if (state === 'playing') mediaShow.start();
@@ -277,7 +286,6 @@ function showTrackChangeBurst(track) {
       if (mediaShow) {
         const newLevel = mediaShow.cycleSpeed();
         if (speedLevelText) speedLevelText.textContent = newLevel;
-        toggleSpeed.title = `Скорость появления медиа: ${newLevel}/5`;
       }
     });
   }
@@ -353,5 +361,112 @@ function showTrackChangeBurst(track) {
     }, delay);
   }
   scheduleLightning();
+
+  // === JS-ТУЛТИПЫ (нижний бар) ===
+  // Показываются при hover и долгом нажатии, исчезают через 2с
+  const BUTTON_TOOLTIPS = {
+    'toggle-screensaver': 'Скринсейвер',
+    'toggle-triggers':    'Надписи / Всплывашки',
+    'toggle-mediashow':   'Фото и видео',
+    'toggle-speed':       'Скорость медиа',
+  };
+
+  let tooltipEl = null;
+  let tooltipHideTimer = null;
+
+  function showTooltip(btn, text) {
+    // Убираем старый если есть
+    if (tooltipEl) { tooltipEl.remove(); tooltipEl = null; }
+    if (tooltipHideTimer) { clearTimeout(tooltipHideTimer); tooltipHideTimer = null; }
+
+    const tip = document.createElement('div');
+    tip.className = 'btn-tooltip';
+    tip.textContent = text;
+    document.body.appendChild(tip);
+
+    // Позиционирование снизу кнопки
+    const rect = btn.getBoundingClientRect();
+    const tipW = tip.offsetWidth || 120;
+    let left = rect.left + rect.width / 2 - tipW / 2;
+    // Клампинг по горизонтали
+    left = Math.max(8, Math.min(window.innerWidth - tipW - 8, left));
+    tip.style.left = left + 'px';
+    tip.style.top = (rect.bottom + 8) + 'px';
+
+    // Появление
+    requestAnimationFrame(() => tip.classList.add('visible'));
+    tooltipEl = tip;
+
+    // Авто-скрытие через 2с
+    tooltipHideTimer = setTimeout(() => hideTooltip(), 2000);
+  }
+
+  function hideTooltip() {
+    if (!tooltipEl) return;
+    tooltipEl.classList.remove('visible');
+    const el = tooltipEl;
+    tooltipEl = null;
+    setTimeout(() => { if (el.parentNode) el.remove(); }, 250);
+    if (tooltipHideTimer) { clearTimeout(tooltipHideTimer); tooltipHideTimer = null; }
+  }
+
+  Object.entries(BUTTON_TOOLTIPS).forEach(([id, text]) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+
+    let holdTimer = null;
+
+    // Ховер (десктоп)
+    btn.addEventListener('mouseenter', () => showTooltip(btn, text));
+    btn.addEventListener('mouseleave', () => hideTooltip());
+
+    // Долгое нажатие (touch: 500ms)
+    btn.addEventListener('touchstart', () => {
+      holdTimer = setTimeout(() => showTooltip(btn, text), 500);
+    }, { passive: true });
+    btn.addEventListener('touchend', () => {
+      if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    });
+    btn.addEventListener('touchcancel', () => {
+      if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    });
+  });
+
+  // === КАСТОМНЫЙ КУРСОР (десктоп, lerp-плавность) ===
+  const cursor = document.getElementById('custom-cursor');
+  const isMobileDevice = /Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent)
+    || window.matchMedia('(pointer: coarse)').matches;
+
+  if (cursor && !isMobileDevice) {
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let curX = mouseX;
+    let curY = mouseY;
+    let rafId = null;
+
+    document.documentElement.style.cursor = 'none'; // Скрываем стандартный
+    cursor.style.display = 'block';
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    // Плавное следование через lerp
+    function animateCursor() {
+      const lerpFactor = 0.18;
+      curX += (mouseX - curX) * lerpFactor;
+      curY += (mouseY - curY) * lerpFactor;
+      cursor.style.left = curX + 'px';
+      cursor.style.top = curY + 'px';
+      rafId = requestAnimationFrame(animateCursor);
+    }
+    rafId = requestAnimationFrame(animateCursor);
+
+    // Чистим при выгрузке страницы
+    window.addEventListener('beforeunload', () => cancelAnimationFrame(rafId));
+  } else if (cursor) {
+    cursor.style.display = 'none'; // Мобайльные: не показываем
+  }
 
 });

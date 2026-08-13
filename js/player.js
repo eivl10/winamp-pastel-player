@@ -4,9 +4,10 @@ class AudioEngine {
     this.tracks = [];
     this.currentIndex = 0;
     this.isShuffled = false;
-    this.shuffleHistory = [];
+    this.shuffledIndices = [];
     this.volume = 0.7;
     this.isPlaying = false;
+    this._playPromise = null; // Защита от race condition
     
     // Callbacks
     this.onTimeUpdate = null;  // fn(currentTime, duration)
@@ -27,8 +28,9 @@ class AudioEngine {
     });
 
     this.audio.addEventListener('ended', () => {
+      this.isPlaying = false;
+      // Только вызываем callback — nextTrack делает app.js через onTrackEnd
       if (this.onTrackEnd) this.onTrackEnd();
-      this.nextTrack();
     });
 
     this.audio.addEventListener('loadedmetadata', () => {
@@ -47,7 +49,15 @@ class AudioEngine {
     if (!this.tracks.length) return;
     this.currentIndex = index;
     const track = this.tracks[this.currentIndex];
+    
+    // Пропускаем PLACEHOLDER-треки
+    if (track.url === 'PLACEHOLDER') {
+      if (this.onTrackChange) this.onTrackChange(track);
+      return;
+    }
+    
     this.audio.src = track.url;
+    this.audio.load(); // Принудительно сбрасываем readyState
     
     if (this.onTrackChange) {
       this.onTrackChange(track);
@@ -55,13 +65,19 @@ class AudioEngine {
   }
 
   play() {
+    // Защита от race condition: если audio.src пуст — ничего не делаем
+    if (!this.audio.src || this.audio.src === window.location.href) {
+      return Promise.resolve();
+    }
     const playPromise = this.audio.play();
     if (playPromise !== undefined) {
       return playPromise.then(() => {
         this.isPlaying = true;
         if (this.onStateChange) this.onStateChange('playing');
       }).catch(error => {
-        if (error.name === 'NotAllowedError') {
+        if (error.name === 'AbortError') {
+          // Игнорируем: проигрыш отменён новым loadTrack
+        } else if (error.name === 'NotAllowedError') {
           console.warn('iOS autoplay prevented');
         } else {
           console.warn('Play error:', error);
