@@ -417,18 +417,15 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 @keyframes gen-boat-float {
-  0%   { transform: translate(112vw,  0px)  rotate(1deg);  opacity: 0; }
-  5%   { opacity: 1; transform: translate(98vw,  -4px) rotate(-1deg); }
-  15%  { transform: translate(84vw,   3px)  rotate( 1.5deg); }
-  25%  { transform: translate(70vw,  -5px)  rotate(-0.5deg); }
-  35%  { transform: translate(56vw,   4px)  rotate( 1deg);  }
-  45%  { transform: translate(44vw,  -3px)  rotate(-1.5deg); }
-  55%  { transform: translate(33vw,   5px)  rotate( 0.5deg); }
-  65%  { transform: translate(22vw,  -4px)  rotate(-1deg);  }
-  75%  { transform: translate(12vw,   3px)  rotate( 1.5deg); }
-  85%  { transform: translate( 3vw,  -4px)  rotate(-0.5deg); }
-  92%  { opacity: 1; transform: translate(-6vw,   2px)  rotate( 1deg);  }
-  100% { opacity: 0; transform: translate(-22vw,  0px)  rotate( 0deg);  }
+  0%   { transform: translate(112vw,  0vh)   rotate(-10deg); opacity: 0; }
+  5%   { opacity: 1; }
+  15%  { transform: translate(95vw,  -3vh)  rotate(-9deg); }
+  30%  { transform: translate(73vw,  -7vh)  rotate(-10deg); }
+  45%  { transform: translate(52vw,  -11vh) rotate(-9deg); }
+  60%  { transform: translate(33vw,  -14vh) rotate(-10deg); }
+  75%  { transform: translate(16vw,  -17vh) rotate(-9deg); }
+  90%  { opacity: 1; transform: translate(3vw, -20vh)  rotate(-10deg); }
+  100% { opacity: 0; transform: translate(-22vw, -22vh) rotate(-10deg); }
 }
 
 @keyframes gen-cloud-drift {

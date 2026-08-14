@@ -924,7 +924,8 @@ function showTrackChangeBurst(track) {
       ];
 
       const boatScale = 0.35 + Math.random() * 0.3; // меньше — река далеко, вид сверху
-      const boatBottom = 42 + Math.random() * 10; // vh — река на аксонометрии Нови Сада
+      // Правая часть реки (начало маршрута лодки)
+      const boatBottom = 36 + Math.random() * 6;
       const animDuration = 44 + Math.floor(Math.random() * 14);
       const svgIdx = Math.floor(Math.random() * BOAT_SVGS.length);
 
