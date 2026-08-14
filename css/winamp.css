@@ -150,6 +150,7 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  line-height: 1; /* предотвращает сдвиг высоты emoji-символами */
 }
 
 .winamp-controls button:active,
@@ -260,9 +261,9 @@
 
 .winamp-window.minimized .winamp-controls button {
   width: 36px;
+  height: 36px;        /* квадрат 36×36 */
   min-width: 36px;
-  min-height: 30px;
-  height: 30px;
+  min-height: 36px;    /* перекрываем min-height: 44px из базового правила */
   font-size: 13px;
   border-radius: 5px;
   padding: 0;
@@ -745,5 +746,13 @@
 .btn-tooltip.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ===== DRAG-AND-DROP ПЛЕЙЛИСТ ===== */
+.playlist-item.drag-over {
+  background: rgba(0, 242, 254, 0.2);
+  border-left: 3px solid #00F2FE;
+  transform: scale(1.01);
+  transition: all 0.1s ease;
 }
 

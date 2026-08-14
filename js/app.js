@@ -1,3 +1,9 @@
+// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ DRAG-AND-DROP И ФОНОВЫХ АНИМАЦИЙ ===
+let dragSrcIndex = null;          // индекс перетаскиваемого трека
+let lightningEnabled = true;      // управляет молниями
+let shootingStarsEnabled = true;  // управляет падающими звёздами
+let rainInterval = null;          // интервал дождя
+
 document.addEventListener('DOMContentLoaded', async () => {
 // === TRACK CHANGE BURST ANIMATION ===
 function showTrackChangeBurst(track) {
@@ -75,6 +81,7 @@ function showTrackChangeBurst(track) {
       const item = document.createElement('div');
       item.className = 'playlist-item';
       item.setAttribute('data-index', i);
+      item.setAttribute('draggable', 'true'); // разрешаем перетаскивание
 
       const numSpan = document.createElement('span');
       numSpan.className = 'track-num';
@@ -95,10 +102,63 @@ function showTrackChangeBurst(track) {
         item.appendChild(iconSpan);
       }
 
+      // Клик для воспроизведения
       item.addEventListener('click', () => {
         engine.loadTrack(i);
         engine.play();
         updateActiveTrack(i);
+      });
+
+      // === DRAG-AND-DROP обработчики ===
+
+      // Начало перетаскивания
+      item.addEventListener('dragstart', (e) => {
+        dragSrcIndex = i;
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      // Елемент под курсором
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        item.classList.add('drag-over');
+      });
+
+      // Курсор ушёл
+      item.addEventListener('dragleave', () => {
+        item.classList.remove('drag-over');
+      });
+
+      // Сброс (перемещаем треки)
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        item.classList.remove('drag-over');
+        if (dragSrcIndex === null || dragSrcIndex === i) return;
+
+        const dropTargetIndex = i;
+
+        // Определяем текущий индекс воспроизведения до перемещения
+        const playingIdx = engine.currentIndex;
+
+        // Меняем треки местами
+        const moved = trackList.splice(dragSrcIndex, 1)[0];
+        trackList.splice(dropTargetIndex, 0, moved);
+
+        // Обновляем движка (engine.tracks — ссылка на тот же массив)
+        engine.tracks = trackList;
+
+        // Обновляем текущий индекс если играется трек
+        if (playingIdx === dragSrcIndex) {
+          engine.currentIndex = dropTargetIndex;
+        } else if (dragSrcIndex < playingIdx && dropTargetIndex >= playingIdx) {
+          engine.currentIndex = playingIdx - 1;
+        } else if (dragSrcIndex > playingIdx && dropTargetIndex <= playingIdx) {
+          engine.currentIndex = playingIdx + 1;
+        }
+
+        dragSrcIndex = null;
+        renderPlaylist(trackList);
+        updateActiveTrack(engine.currentIndex);
       });
 
       container.appendChild(item);
@@ -313,6 +373,23 @@ function showTrackChangeBurst(track) {
           bgLayer.classList.add('visible');
           if (blobBg) blobBg.style.opacity = '0';
           toggleBackground.classList.add('active');
+
+          // Фон 1 — Велигама: листья
+          if (currentBgIndex === 1) {
+            lightningEnabled = false;
+            shootingStarsEnabled = false;
+            startLeafSway();
+          // Фон 2 — центр Шри-Ланки: дождь
+          } else if (currentBgIndex === 2) {
+            lightningEnabled = false;
+            shootingStarsEnabled = false;
+            startRain();
+          // Фон 3 — Нови Сад: статик
+          } else {
+            lightningEnabled = false;
+            shootingStarsEnabled = false;
+            stopBgAnimation();
+          }
         };
         img.onerror = () => {
           console.error('BG image failed to load:', src);
@@ -321,6 +398,11 @@ function showTrackChangeBurst(track) {
         };
         img.src = src;
       } else {
+        // Фон 0 — дефолт: молнии + звёзды
+        lightningEnabled = true;
+        shootingStarsEnabled = true;
+        stopBgAnimation();
+
         bgLayer.classList.remove('visible');
         setTimeout(() => { bgLayer.style.backgroundImage = ''; }, 650);
         if (blobBg) blobBg.style.opacity = '';
@@ -390,8 +472,11 @@ function showTrackChangeBurst(track) {
     const min = 2 * 60 * 1000;
     const max = 5 * 60 * 1000;
     const delay = Math.floor(Math.random() * (max - min + 1)) + min;
-    
+
     setTimeout(() => {
+      // Пропускаем цикл если молнии выключены
+      if (!lightningEnabled) { scheduleLightning(); return; }
+
       const flash = document.createElement('div');
       flash.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 99999; pointer-events: none; animation: lightning-flash 2s ease-out forwards;';
       document.body.appendChild(flash);
@@ -562,6 +647,9 @@ function showTrackChangeBurst(track) {
   // === ПАДАЮЩИЕ ЗВЁЗДЫ ===
   function startShootingStars() {
     function spawnStar() {
+      // Пропускаем если звёзды выключены
+      if (!shootingStarsEnabled) return;
+
       const star = document.createElement('div');
       const goRight = Math.random() > 0.5;
       const startX = Math.random() * window.innerWidth;
@@ -613,5 +701,68 @@ function showTrackChangeBurst(track) {
     scheduleWave();
   }
   startShootingStars();
+
+  // === ФОНОВЫЕ АНИМАЦИИ ===
+  const bgAnimLayer = document.getElementById('bg-animation-layer');
+
+  // Остановка всех фоновых анимаций
+  function stopBgAnimation() {
+    if (bgAnimLayer) bgAnimLayer.innerHTML = '';
+    if (rainInterval) { clearInterval(rainInterval); rainInterval = null; }
+  }
+
+  // Дождь (фон 2 — центр Шри-Ланки)
+  function startRain() {
+    stopBgAnimation();
+    rainInterval = setInterval(() => {
+      if (!bgAnimLayer) return;
+      const drop = document.createElement('div');
+      const x = 20 + Math.random() * 60;           // центр острова: 20%–80%
+      const duration = 0.8 + Math.random() * 0.6;
+      const size = 1 + Math.random() * 1;
+      drop.style.cssText = `
+        position: absolute;
+        left: ${x}%;
+        top: 0;
+        width: ${size}px;
+        height: ${12 + Math.random() * 8}px;
+        background: linear-gradient(180deg, transparent, rgba(180,210,255,0.7));
+        border-radius: 50%;
+        animation: rain-fall ${duration}s linear forwards;
+      `;
+      bgAnimLayer.appendChild(drop);
+      setTimeout(() => { if (drop.parentNode) drop.remove(); }, duration * 1000 + 100);
+    }, 30);
+  }
+
+  // Покачивание листьев (фон 1 — Велигама)
+  function startLeafSway() {
+    stopBgAnimation();
+    if (!bgAnimLayer) return;
+    const positions = [
+      { left: '5%',  top: '15%', delay: '0s',   size: 40 },
+      { left: '8%',  top: '30%', delay: '0.5s', size: 30 },
+      { left: '85%', top: '20%', delay: '1s',   size: 45 },
+      { left: '90%', top: '35%', delay: '1.5s', size: 35 },
+      { left: '15%', top: '55%', delay: '0.8s', size: 25 },
+      { left: '80%', top: '60%', delay: '1.2s', size: 28 },
+    ];
+    positions.forEach(p => {
+      const leaf = document.createElement('div');
+      leaf.innerHTML = '🌿';
+      leaf.style.cssText = `
+        position: absolute;
+        left: ${p.left};
+        top: ${p.top};
+        font-size: ${p.size}px;
+        animation: leaf-sway ${3 + Math.random() * 2}s ease-in-out infinite;
+        animation-delay: ${p.delay};
+        opacity: 0.55;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        transform-origin: bottom center;
+      `;
+      bgAnimLayer.appendChild(leaf);
+    });
+  }
 
 });
