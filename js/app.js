@@ -374,6 +374,10 @@ function showTrackChangeBurst(track) {
           if (blobBg) blobBg.style.opacity = '0';
           toggleBackground.classList.add('active');
 
+          const so = document.getElementById('screensaver-overlay');
+          if (so) so.style.display = 'none';
+          if (typeof screensaver !== 'undefined') screensaver.stop();
+
           // Фон 1 — Велигама: листья
           if (currentBgIndex === 1) {
             lightningEnabled = false;
@@ -402,6 +406,10 @@ function showTrackChangeBurst(track) {
         lightningEnabled = true;
         shootingStarsEnabled = true;
         stopBgAnimation();
+        
+        const so = document.getElementById('screensaver-overlay');
+        if (so) so.style.display = 'block';
+        if (typeof screensaver !== 'undefined') screensaver.start();
 
         bgLayer.classList.remove('visible');
         setTimeout(() => { bgLayer.style.backgroundImage = ''; }, 650);
