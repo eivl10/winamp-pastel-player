@@ -368,24 +368,32 @@ input[type=range]::-webkit-slider-runnable-track {
   100% { transform: translate(110vw, -10vh) scale(0.8); opacity: 0; }
 }
 
-/* === СГЕНЕРИРОВАННЫЕ ЭЛЕМЕНТЫ (mix-blend-mode) === */
+/* === СГЕНЕРИРОВАННЫЕ ЭЛЕМЕНТЫ (PNG) === */
 @keyframes gen-surfer-ride {
-  0% { transform: translate(-15vw, 0); opacity: 0; }
-  10% { opacity: 0.9; transform: translate(5vw, 5px); }
-  90% { opacity: 0.9; transform: translate(85vw, -5px); }
-  100% { opacity: 0; transform: translate(105vw, 0); }
+  0% { transform: translate(-15vw, 0) rotate(-5deg); opacity: 0; }
+  10% { opacity: 1; transform: translate(5vw, 15px) rotate(2deg); }
+  25% { transform: translate(25vw, -5px) rotate(-2deg); }
+  50% { transform: translate(50vw, 10px) rotate(3deg); }
+  75% { transform: translate(75vw, -10px) rotate(-1deg); }
+  90% { opacity: 1; transform: translate(90vw, 5px) rotate(2deg); }
+  100% { opacity: 0; transform: translate(110vw, 0) rotate(0deg); }
 }
+
 @keyframes gen-boat-float {
-  0% { transform: translate(105vw, 0) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.9; }
-  90% { opacity: 0.9; }
-  100% { opacity: 0; transform: translate(-15vw, 0) rotate(-2deg); }
+  0% { transform: translate(110vw, 0) rotate(2deg); opacity: 0; }
+  10% { opacity: 1; transform: translate(90vw, -10px) rotate(-1deg); }
+  25% { transform: translate(70vw, 5px) rotate(2deg); }
+  50% { transform: translate(45vw, -5px) rotate(-2deg); }
+  75% { transform: translate(20vw, 8px) rotate(1deg); }
+  90% { opacity: 1; transform: translate(5vw, -5px) rotate(-1deg); }
+  100% { opacity: 0; transform: translate(-20vw, 0) rotate(0deg); }
 }
+
 @keyframes gen-cloud-drift {
-  0% { transform: translate(-25vw, 0) scale(1); opacity: 0; }
-  20% { opacity: 0.6; }
-  80% { opacity: 0.6; }
-  100% { opacity: 0; transform: translate(110vw, 0) scale(1.1); }
+  0% { transform: translate(-30vw, 0) scale(1); opacity: 0; }
+  15% { opacity: 0.8; }
+  85% { opacity: 0.8; }
+  100% { opacity: 0; transform: translate(120vw, 0) scale(1.2); }
 }
 
 .gen-element {
@@ -396,22 +404,19 @@ input[type=range]::-webkit-slider-runnable-track {
   background-position: center;
 }
 .gen-surfer {
-  width: 150px;
-  height: 150px;
+  width: 130px;
+  height: 130px;
   bottom: 25vh;
-  mix-blend-mode: multiply; /* белый фон растворяется */
-  animation: gen-surfer-ride 15s linear forwards;
+  animation: gen-surfer-ride 20s ease-in-out forwards;
 }
 .gen-boat {
-  width: 250px;
-  height: 150px;
+  width: 220px;
+  height: 120px;
   bottom: 20vh;
-  mix-blend-mode: multiply; /* белый фон растворяется */
-  animation: gen-boat-float 35s linear forwards;
+  animation: gen-boat-float 45s ease-in-out forwards;
 }
 .gen-cloud {
-  width: 300px;
-  height: 200px;
-  mix-blend-mode: screen; /* чёрный фон растворяется */
-  animation: gen-cloud-drift 45s linear forwards;
+  width: 280px;
+  height: 180px;
+  animation: gen-cloud-drift 55s linear forwards;
 }

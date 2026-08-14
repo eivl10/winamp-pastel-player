@@ -370,6 +370,14 @@ function showTrackChangeBurst(track) {
         const img = new Image();
         img.onload = () => {
           bgLayer.style.backgroundImage = `url("${src}")`;
+          
+          // Применяем фильтр живой воды для Велигамы (1) и Нови Сада (3)
+          if (currentBgIndex === 1 || currentBgIndex === 3) {
+            bgLayer.style.filter = 'url(#waterRipple) brightness(1.05)';
+          } else {
+            bgLayer.style.filter = 'none';
+          }
+          
           bgLayer.classList.add('visible');
           if (blobBg) blobBg.style.opacity = '0';
           toggleBackground.classList.add('active');
@@ -728,18 +736,25 @@ function showTrackChangeBurst(track) {
     if (!bgAnimLayer) return;
     const interval = setInterval(() => {
       if (document.hidden) return;
-      const count = Math.random() > 0.6 ? 2 : 1;
+      // Спавним от 1 до 3 сёрферов одновременно
+      const count = Math.floor(Math.random() * 3) + 1;
       for (let i = 0; i < count; i++) {
         setTimeout(() => {
           const surfer = document.createElement('div');
           surfer.className = 'gen-element gen-surfer';
-          surfer.style.backgroundImage = 'url("assets/images/surfer_element.jpg")';
-          surfer.style.bottom = (20 + Math.random() * 15) + 'vh';
+          surfer.style.backgroundImage = 'url("assets/images/surfer_element.png")';
+          surfer.style.bottom = (15 + Math.random() * 25) + 'vh';
+          // Разные цвета плавок и досок для "разных" сёрферов
+          const hue = Math.floor(Math.random() * 360);
+          const flip = Math.random() > 0.8 ? 'scaleX(-1)' : ''; // иногда плывут в другую сторону
+          surfer.style.filter = `hue-rotate(${hue}deg)`;
+          surfer.style.transform = flip;
+          
           bgAnimLayer.appendChild(surfer);
-          setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 16000);
-        }, i * (1500 + Math.random() * 2000));
+          setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 21000);
+        }, i * (800 + Math.random() * 1500));
       }
-    }, 12000 + Math.random() * 8000);
+    }, 4000 + Math.random() * 4000); // Спавн гораздо чаще!
     genElementIntervals.push(interval);
   }
 
@@ -751,11 +766,15 @@ function showTrackChangeBurst(track) {
       if (document.hidden) return;
       const boat = document.createElement('div');
       boat.className = 'gen-element gen-boat';
-      boat.style.backgroundImage = 'url("assets/images/boat_element.jpg")';
-      boat.style.bottom = (10 + Math.random() * 10) + 'vh'; // на реке внизу
+      boat.style.backgroundImage = 'url("assets/images/boat_element.png")';
+      boat.style.bottom = (5 + Math.random() * 12) + 'vh'; 
+      // Разные оттенки лодок
+      const hue = Math.floor(Math.random() * 40) - 20;
+      boat.style.filter = `hue-rotate(${hue}deg)`;
+      
       bgAnimLayer.appendChild(boat);
-      setTimeout(() => { if (boat.parentNode) boat.remove(); }, 36000);
-    }, 15000 + Math.random() * 10000);
+      setTimeout(() => { if (boat.parentNode) boat.remove(); }, 46000);
+    }, 5000 + Math.random() * 5000); // Спавн очень частый
     genElementIntervals.push(interval);
   }
 
@@ -783,16 +802,18 @@ function showTrackChangeBurst(track) {
       setTimeout(() => { if (drop.parentNode) drop.remove(); }, duration * 1000 + 100);
     }, 15);
 
-    // Облака
+    // Облака (больше и чаще)
     const cloudInterval = setInterval(() => {
       if (document.hidden) return;
       const cloud = document.createElement('div');
       cloud.className = 'gen-element gen-cloud';
-      cloud.style.backgroundImage = 'url("assets/images/cloud_element.jpg")';
-      cloud.style.top = (2 + Math.random() * 15) + 'vh'; // в небе
+      cloud.style.backgroundImage = 'url("assets/images/cloud_element.png")';
+      cloud.style.top = (-5 + Math.random() * 30) + 'vh'; // весь верх неба
+      const scale = 0.5 + Math.random() * 1.5;
+      cloud.style.transform = `scale(${scale})`;
       bgAnimLayer.appendChild(cloud);
-      setTimeout(() => { if (cloud.parentNode) cloud.remove(); }, 46000);
-    }, 12000 + Math.random() * 10000);
+      setTimeout(() => { if (cloud.parentNode) cloud.remove(); }, 56000);
+    }, 4000 + Math.random() * 5000); // Спавн очень частый
     genElementIntervals.push(cloudInterval);
   }
 
