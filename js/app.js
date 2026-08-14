@@ -925,7 +925,8 @@ function showTrackChangeBurst(track) {
 
       const boatScale = 0.35 + Math.random() * 0.3; // меньше — река далеко, вид сверху
       // Правая часть реки (начало маршрута лодки)
-      const boatBottom = 20 + Math.random() * 12; // vh — Дунай горизонтально в нижней части нового фона
+      // Река: bottom 9-41vh (из скриншота). Лодки — строго в воде.
+      const boatBottom = 8 + Math.random() * 20; // 8-28vh — центр реки
       const animDuration = 44 + Math.floor(Math.random() * 14);
       const svgIdx = Math.floor(Math.random() * BOAT_SVGS.length);
 
