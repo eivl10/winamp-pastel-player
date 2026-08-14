@@ -289,19 +289,40 @@ function showTrackChangeBurst(track) {
 
   // === ПЕРЕКЛЮЧЕНИЕ ФОНА ===
   const toggleBackground = document.getElementById('toggle-background');
-  const bgClasses = ['', 'bg-weligama', 'bg-srilanka', 'bg-novisad'];
+  const bgLayer = document.getElementById('bg-layer');
+  const blobBg = document.querySelector('.blob-bg');
+  const BACKGROUNDS = [
+    null,
+    'assets/images/weligama_bg.jpg',
+    'assets/images/srilanka_bg.jpg',
+    'assets/images/novisad_bg.jpg',
+  ];
   let currentBgIndex = 0;
-  
-  if (toggleBackground) {
+
+  if (toggleBackground && bgLayer) {
     toggleBackground.addEventListener('click', () => {
-      if (bgClasses[currentBgIndex]) {
-        document.body.classList.remove(bgClasses[currentBgIndex]);
-      }
-      currentBgIndex = (currentBgIndex + 1) % bgClasses.length;
-      if (bgClasses[currentBgIndex]) {
-        document.body.classList.add(bgClasses[currentBgIndex]);
-        toggleBackground.classList.add('active');
+      currentBgIndex = (currentBgIndex + 1) % BACKGROUNDS.length;
+      const src = BACKGROUNDS[currentBgIndex];
+
+      if (src) {
+        // Предзагружаем картинку перед показом
+        const img = new Image();
+        img.onload = () => {
+          bgLayer.style.backgroundImage = `url('${src}')`;
+          bgLayer.classList.add('visible');
+          if (blobBg) blobBg.style.opacity = '0';
+          toggleBackground.classList.add('active');
+        };
+        img.onerror = () => {
+          console.warn('BG image failed to load:', src);
+        };
+        img.src = src;
       } else {
+        // Возврат к дефолтному (blobs)
+        bgLayer.classList.remove('visible');
+        // Даём transition отработать, потом чистим src
+        setTimeout(() => { bgLayer.style.backgroundImage = ''; }, 650);
+        if (blobBg) blobBg.style.opacity = '';
         toggleBackground.classList.remove('active');
       }
     });
