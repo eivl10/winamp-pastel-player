@@ -685,9 +685,42 @@ function showTrackChangeBurst(track) {
         transform-origin: right center;
         opacity: 0;
       `;
-      document.body.appendChi  // Дождь (фон 2 — центр Шри-Ланки)
+      document.body.appendChild(star);
+
+      const keyframes = [
+        { opacity: 0, transform: `rotate(${angle}deg) scaleX(0) translate(0,0)` },
+        { opacity: 1, transform: `rotate(${angle}deg) scaleX(1) translate(0,0)`, offset: 0.2 },
+        { opacity: 0, transform: `rotate(${angle}deg) scaleX(0.3) translate(${dx}px, ${dy}px)` }
+      ];
+      const anim = star.animate(keyframes, { duration, easing: 'ease-in', fill: 'forwards' });
+      anim.onfinish = () => { if (star.parentNode) star.remove(); };
+    }
+
+    function scheduleWave() {
+      const delay = 10000 + Math.random() * 5000; // 10-15 с
+      setTimeout(() => {
+        const count = 1 + Math.floor(Math.random() * 3); // 1-3 звезды
+        for (let i = 0; i < count; i++) {
+          setTimeout(spawnStar, i * (200 + Math.random() * 300));
+        }
+        scheduleWave();
+      }, delay);
+    }
+    scheduleWave();
+  }
+  startShootingStars();
+
+  // === ФОНОВЫЕ АНИМАЦИИ ===
+  const bgAnimLayer = document.getElementById('bg-animation-layer');
+
+  // Остановка всех фоновых анимаций
+  function stopBgAnimation() {
+    if (bgAnimLayer) bgAnimLayer.innerHTML = '';
+    if (typeof rainInterval !== 'undefined' && rainInterval) { clearInterval(rainInterval); rainInterval = null; }
+  }
+
+  // Дождь (фон 2 — центр Шри-Ланки)
   function startRain() {
-    stopBgAnimation();
     rainInterval = setInterval(() => {
       if (!bgAnimLayer) return;
       const drop = document.createElement('div');
