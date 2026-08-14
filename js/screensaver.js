@@ -8,6 +8,7 @@ class ScreensaverEngine {
     this.stars = [];
     this.mode = 'normal'; 
     this._loop = this._loop.bind(this);
+    this._resizeBound = this._resize.bind(this); // храним ссылку для правильного removeEventListener
   }
 
   _initStars() {
@@ -36,13 +37,14 @@ class ScreensaverEngine {
   start() {
     if (this.running) return;
     this.running = true;
-    window.addEventListener('resize', this._resize.bind(this));
+    window.addEventListener('resize', this._resizeBound);
     this._resize();
     this._loop();
   }
 
   stop() {
     this.running = false;
+    window.removeEventListener('resize', this._resizeBound);
     if (this.animFrame) {
       cancelAnimationFrame(this.animFrame);
       this.animFrame = null;

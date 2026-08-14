@@ -147,7 +147,14 @@ function showTrackChangeBurst(track) {
 
   engine.onTrackEnd = () => {
     engine.nextTrack();
-    loadAndUpdateUI(engine.currentIndex);
+    // nextTrack() уже вызывает loadTrack() + play() внутри
+    // здесь только обновляем UI
+    const track = engine.getCurrentTrack();
+    if (track) {
+      updateMarquee(track);
+      triggerEngine.setTriggers(track.triggers || []);
+    }
+    updateActiveTrack(engine.currentIndex);
   };
 
   engine.onStateChange = (state) => {
@@ -280,6 +287,26 @@ function showTrackChangeBurst(track) {
     });
   }
 
+  // === ПЕРЕКЛЮЧЕНИЕ ФОНА ===
+  const toggleBackground = document.getElementById('toggle-background');
+  const bgClasses = ['', 'bg-weligama', 'bg-srilanka', 'bg-novisad'];
+  let currentBgIndex = 0;
+  
+  if (toggleBackground) {
+    toggleBackground.addEventListener('click', () => {
+      if (bgClasses[currentBgIndex]) {
+        document.body.classList.remove(bgClasses[currentBgIndex]);
+      }
+      currentBgIndex = (currentBgIndex + 1) % bgClasses.length;
+      if (bgClasses[currentBgIndex]) {
+        document.body.classList.add(bgClasses[currentBgIndex]);
+        toggleBackground.classList.add('active');
+      } else {
+        toggleBackground.classList.remove('active');
+      }
+    });
+  }
+
   // 6. Initialization Logic
   let isAppInitialized = false;
   function startApp() {
@@ -355,6 +382,7 @@ function showTrackChangeBurst(track) {
   // === JS-ТУЛТИПЫ (нижний бар) ===
   // Показываются при hover и долгом нажатии, исчезают через 2с
   const BUTTON_TOOLTIPS = {
+    'toggle-background':  'Смена фона',
     'toggle-triggers':    'Надписи / Всплывашки',
     'toggle-mediashow':   'Фото и видео',
     'toggle-speed':       'Скорость медиа',
@@ -436,6 +464,7 @@ function showTrackChangeBurst(track) {
         <div class="info-legend-row"><span>💬</span><span>Надписи / Всплывашки — вкл/выкл текстовые триггеры</span></div>
         <div class="info-legend-row"><span>🖼</span><span>Фото и видео — вкл/выкл медиашоу</span></div>
         <div class="info-legend-row"><span>⚡</span><span>Скорость медиа — меняет скорость появления (1–5)</span></div>
+        <div class="info-legend-row"><span>🌄</span><span>Смена фона — переключает 4 разных фона</span></div>
       `;
       el.style.cssText = `
         position: fixed;
