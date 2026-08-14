@@ -3,6 +3,7 @@ let dragSrcIndex = null;          // индекс перетаскиваемог
 let lightningEnabled = true;      // управляет молниями
 let shootingStarsEnabled = true;  // управляет падающими звёздами
 let rainInterval = null;          // интервал дождя
+let mediaShowUserEnabled = true;
 
 document.addEventListener('DOMContentLoaded', async () => {
 // === TRACK CHANGE BURST ANIMATION ===
@@ -241,9 +242,9 @@ function showTrackChangeBurst(track) {
     const eqBars = document.getElementById('eq-bars');
     if (eqBars) eqBars.classList.toggle('playing', state === 'playing');
     
-    // Пауза/возобновление mediashow
+    // Пауза/возобновление mediashow (только если пользователь не выключил)
     if (mediaShow) {
-      if (state === 'playing') mediaShow.start();
+      if (state === 'playing' && mediaShowUserEnabled) mediaShow.start();
       else mediaShow.stop();
     }
   };
@@ -329,7 +330,13 @@ function showTrackChangeBurst(track) {
   if (toggleMediashow) {
     toggleMediashow.addEventListener('click', () => {
       if (mediaShow) {
-        const enabled = mediaShow.toggle();
+        mediaShowUserEnabled = !mediaShowUserEnabled;
+        const enabled = mediaShowUserEnabled;
+        if (!enabled) {
+          mediaShow.stop();
+        } else if (engine.audio && !engine.audio.paused) {
+          mediaShow.start();
+        }
         toggleMediashow.classList.toggle('active', enabled);
         toggleMediashow.classList.toggle('off', !enabled);
       }
@@ -349,6 +356,8 @@ function showTrackChangeBurst(track) {
 
   // === ПЕРЕКЛЮЧЕНИЕ ФОНА ===
   const toggleBackground = document.getElementById('toggle-background');
+  toggleBackground.setAttribute('data-bg', '0');
+  toggleBackground.textContent = '🌑';
   const bgLayer = document.getElementById('bg-layer');
   const blobBg = document.querySelector('.blob-bg');
   // Вычисляем базовый путь — работает и при file://, и при http://
@@ -364,6 +373,8 @@ function showTrackChangeBurst(track) {
   if (toggleBackground && bgLayer) {
     toggleBackground.addEventListener('click', () => {
       currentBgIndex = (currentBgIndex + 1) % BACKGROUNDS.length;
+      const BG_ICONS = ['🌑', '🌊', '🌿', '🏙'];
+      // иконка обновится чуть позже, после загрузки фона
       const src = BACKGROUNDS[currentBgIndex];
 
       if (src) {
@@ -379,8 +390,9 @@ function showTrackChangeBurst(track) {
           }
           
           bgLayer.classList.add('visible');
+          toggleBackground.textContent = BG_ICONS[currentBgIndex];
           if (blobBg) blobBg.style.opacity = '0';
-          toggleBackground.classList.add('active');
+          toggleBackground.setAttribute('data-bg', currentBgIndex);
 
           const so = document.getElementById('screensaver-overlay');
           if (so) so.style.display = 'none';
@@ -420,9 +432,10 @@ function showTrackChangeBurst(track) {
         if (typeof screensaver !== 'undefined') screensaver.start();
 
         bgLayer.classList.remove('visible');
+        toggleBackground.textContent = BG_ICONS[0];
         setTimeout(() => { bgLayer.style.backgroundImage = ''; }, 650);
         if (blobBg) blobBg.style.opacity = '';
-        toggleBackground.classList.remove('active');
+        toggleBackground.setAttribute('data-bg', '0');
       }
     });
   } else {
@@ -764,27 +777,40 @@ function showTrackChangeBurst(track) {
     genElementIntervals.push(foamInterval);
     spawnFoam();
 
-    // Живой океан: волновой SVG-оверлей
-    const waveOverlay = document.createElement('div');
-    waveOverlay.id = 'wave-overlay';
-    waveOverlay.style.cssText = `
+    // Анимируем SVG-фильтр живой воды
+    let wavePhase = 0;
+    const waterAnimInterval = setInterval(() => {
+      if (!bgAnimActive || currentBgIndex !== 1) { clearInterval(waterAnimInterval); return; }
+      wavePhase += 0.025;
+      const bfX = 0.008 + Math.sin(wavePhase) * 0.004;
+      const bfY = 0.005 + Math.cos(wavePhase * 0.7) * 0.002;
+      const turbEl = document.querySelector('#waterRipple feTurbulence');
+      if (turbEl) turbEl.setAttribute('baseFrequency', `${bfX.toFixed(4)} ${bfY.toFixed(4)}`);
+    }, 80);
+    genElementIntervals.push(waterAnimInterval);
+
+    // Пульсирующий световой оверлей (имитация бликов на воде)
+    const shineOverlay = document.createElement('div');
+    shineOverlay.style.cssText = `
       position: absolute;
-      bottom: 0;
+      bottom: 20%;
       left: 0;
-      width: 200%;
-      height: 55vh;
+      width: 100%;
+      height: 40%;
       pointer-events: none;
       z-index: 2;
-      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'><path fill='rgba(0,140,200,0.12)' d='M0,160 C360,280 720,40 1080,160 C1260,220 1350,200 1440,160 L1440,320 L0,320 Z'/><path fill='rgba(0,160,220,0.08)' d='M0,200 C300,120 600,280 900,200 C1100,140 1280,240 1440,200 L1440,320 L0,320 Z'/></svg>") repeat-x bottom;
-      background-size: 50% 100%;
-      animation: wave-scroll 8s linear infinite;
+      background: radial-gradient(ellipse 80% 50% at 35% 60%,
+        rgba(255,255,255,0.07) 0%,
+        rgba(150,220,255,0.04) 50%,
+        transparent 100%);
+      animation: ocean-pulse 5s ease-in-out infinite;
     `;
-    bgAnimLayer.appendChild(waveOverlay);
+    bgAnimLayer.appendChild(shineOverlay);
 
     function spawnSurfersWave() {
       if (currentBgIndex !== 1 || document.hidden) return;
       // Спавним от 1 до 3 сёрферов одновременно
-      const count = Math.floor(Math.random() * 3) + 1;
+      const count = 1; // один сёрфер за раз
       for (let i = 0; i < count; i++) {
         setTimeout(() => {
           if (!bgAnimActive || currentBgIndex !== 1) return;
@@ -799,10 +825,10 @@ function showTrackChangeBurst(track) {
             `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'><ellipse cx='50' cy='78' rx='42' ry='7' fill='%23A855F7'/><ellipse cx='15' cy='78' rx='10' ry='3' fill='rgba(255,255,255,0.7)'/><rect x='45' y='41' width='10' height='24' rx='5' fill='white'/><circle cx='50' cy='32' r='9' fill='%23FFDAA0'/><line x1='45' y1='49' x2='25' y2='43' stroke='white' stroke-width='5' stroke-linecap='round'/><line x1='55' y1='49' x2='75' y2='44' stroke='white' stroke-width='5' stroke-linecap='round'/><rect x='44' y='63' width='6' height='14' rx='3' fill='%23FF6B6B'/><rect x='50' y='63' width='6' height='14' rx='3' fill='%23FF6B6B'/></svg>`
           ];
 
-          const scale = 0.7 + Math.random() * 0.6;
+          const scale = 0.35 + Math.random() * 0.3; // мельче — они на фоне волн
           const depthOpacity = 0.6 + scale * 0.3;
-          const bottomPos = 30 + Math.random() * 18; // vh — зона волн Велигамы
-          const animDuration = 20 + Math.floor(Math.random() * 8);
+          const bottomPos = 32 + Math.random() * 14; // зона волн Велигамы
+          const animDuration = 14 + Math.floor(Math.random() * 5); // 14-19s — короче, wipeout раньше
           const svgIdx = Math.floor(Math.random() * SURFER_SVGS.length);
 
           const surfer = document.createElement('div');
@@ -875,7 +901,7 @@ function showTrackChangeBurst(track) {
     }
 
     spawnSurfersWave();
-    const interval = setInterval(spawnSurfersWave, 4000 + Math.random() * 4000); // Спавн гораздо чаще!
+    const interval = setInterval(spawnSurfersWave, 10000 + Math.random() * 6000); // Спавн гораздо чаще!
     genElementIntervals.push(interval);
   }
 
@@ -897,8 +923,8 @@ function showTrackChangeBurst(track) {
         `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><path d='M15 48 Q100 36 185 48 L170 68 Q100 75 30 68 Z' fill='%23CC2200'/><path d='M15 48 Q100 36 185 48' fill='none' stroke='%23990000' stroke-width='3'/><path d='M30 48 L30 30' stroke='%23666' stroke-width='2'/><rect x='30' y='20' width='18' height='10' fill='%2300CC44'/><rect x='70' y='32' width='70' height='18' rx='3' fill='white' stroke='%23CC2200' stroke-width='2'/><rect x='73' y='35' width='20' height='6' rx='1' fill='%2387CEEB' opacity='0.8'/><rect x='97' y='35' width='20' height='6' rx='1' fill='%2387CEEB' opacity='0.8'/><ellipse cx='190' cy='58' rx='6' ry='2' fill='rgba(255,255,255,0.6)'/></svg>`
       ];
 
-      const boatScale = 0.55 + Math.random() * 0.6;
-      const boatBottom = 34 + Math.random() * 12; // vh — на реке Дунай
+      const boatScale = 0.35 + Math.random() * 0.3; // меньше — река далеко, вид сверху
+      const boatBottom = 42 + Math.random() * 10; // vh — река на аксонометрии Нови Сада
       const animDuration = 44 + Math.floor(Math.random() * 14);
       const svgIdx = Math.floor(Math.random() * BOAT_SVGS.length);
 
@@ -965,7 +991,7 @@ function showTrackChangeBurst(track) {
     }
 
     spawnBoat();
-    const interval = setInterval(spawnBoat, 5000 + Math.random() * 5000); // Спавн очень частый
+    const interval = setInterval(spawnBoat, 18000 + Math.random() * 12000); // Спавн очень частый
     genElementIntervals.push(interval);
   }
 
