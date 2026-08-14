@@ -41,8 +41,10 @@ class TriggerEngine {
 
     let el;
     if (trigger.type === 'image') {
+      const item = window.MediaPool ? window.MediaPool.getNextOfType('image') : null;
+      const src = item ? item.src : trigger.src;
       el = document.createElement('img');
-      el.src = trigger.src;
+      el.src = src;
       el.style.maxWidth = '75vw';
       el.style.maxHeight = '55vh';
       el.style.borderRadius = '14px';
@@ -63,8 +65,10 @@ class TriggerEngine {
         }
       });
     } else if (trigger.type === 'video') {
+      const item = window.MediaPool ? window.MediaPool.getNextOfType('video') : null;
+      const src = item ? item.src : trigger.src;
       el = document.createElement('video');
-      el.src = trigger.src;
+      el.src = src;
       el.autoplay = true;
       el.muted = true;
       el.playsInline = true;

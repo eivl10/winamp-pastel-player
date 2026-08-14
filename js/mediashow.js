@@ -38,22 +38,15 @@ const SPEED_INTERVALS = {
   5: 1600   // Турбо
 };
 
-class MediaShow {
-  constructor(containerEl) {
-    this.container = containerEl; // #mediashow-layer
-    this.running = false;
-    this.interval = null;
-    this.activeItems = 0;
-    this.MAX_ITEMS = 3;
-    this.speedLevel = 2; // По умолчанию уровень 2 (редко)
-    this.enabled = true;
-    this.totalShown = 0;
-    this.specialVideoShown = false;
-    this.imagePool = [];
-    this.videoPool = [];
-    this.lastImageSrc = null;
-    this.lastVideoSrc = null;
-    this._preloadAssets();
+class MediaPool {
+  constructor() {
+    this.allMedia = [
+      ...MEDIA_IMAGES.map(src => ({ type: 'image', src })),
+      ...MEDIA_VIDEOS.map(src => ({ type: 'video', src }))
+    ];
+    this.deck = [];
+    this.lastShownSrc = null;
+    this._refill();
   }
 
   _shuffle(array) {
@@ -65,32 +58,77 @@ class MediaShow {
     return arr;
   }
 
-  _getNextImage() {
-    if (!this.imagePool || this.imagePool.length === 0) {
-      const shuffled = this._shuffle(MEDIA_IMAGES);
-      if (this.lastImageSrc && shuffled.length > 1 && shuffled[shuffled.length - 1] === this.lastImageSrc) {
-        const swapIdx = Math.floor(Math.random() * (shuffled.length - 1));
-        [shuffled[shuffled.length - 1], shuffled[swapIdx]] = [shuffled[swapIdx], shuffled[shuffled.length - 1]];
-      }
-      this.imagePool = shuffled;
+  _refill() {
+    const shuffled = this._shuffle(this.allMedia);
+    if (this.lastShownSrc && shuffled.length > 1 && shuffled[0].src === this.lastShownSrc) {
+      const swapIdx = 1 + Math.floor(Math.random() * (shuffled.length - 1));
+      [shuffled[0], shuffled[swapIdx]] = [shuffled[swapIdx], shuffled[0]];
     }
-    const src = this.imagePool.pop();
-    this.lastImageSrc = src;
-    return src;
+    this.deck = shuffled;
   }
 
-  _getNextVideo() {
-    if (!this.videoPool || this.videoPool.length === 0) {
-      const shuffled = this._shuffle(MEDIA_VIDEOS);
-      if (this.lastVideoSrc && shuffled.length > 1 && shuffled[shuffled.length - 1] === this.lastVideoSrc) {
-        const swapIdx = Math.floor(Math.random() * (shuffled.length - 1));
-        [shuffled[shuffled.length - 1], shuffled[swapIdx]] = [shuffled[swapIdx], shuffled[shuffled.length - 1]];
-      }
-      this.videoPool = shuffled;
+  _isOnScreen(src) {
+    const filename = src.split('/').pop();
+    const elements = document.querySelectorAll('#mediashow-layer img, #mediashow-layer video, #media-overlay img, #media-overlay video');
+    for (const el of elements) {
+      if (el.src && el.src.includes(filename)) return true;
     }
-    const src = this.videoPool.pop();
-    this.lastVideoSrc = src;
-    return src;
+    return false;
+  }
+
+  getNext() {
+    if (this.deck.length === 0) {
+      this._refill();
+    }
+
+    let chosenIdx = 0;
+    for (let i = 0; i < this.deck.length; i++) {
+      if (!this._isOnScreen(this.deck[i].src)) {
+        chosenIdx = i;
+        break;
+      }
+    }
+
+    const item = this.deck.splice(chosenIdx, 1)[0];
+    this.lastShownSrc = item.src;
+    return item;
+  }
+
+  getNextOfType(type) {
+    if (this.deck.length === 0) {
+      this._refill();
+    }
+
+    let foundIdx = this.deck.findIndex(item => item.type === type && !this._isOnScreen(item.src));
+    if (foundIdx === -1) {
+      foundIdx = this.deck.findIndex(item => item.type === type);
+    }
+
+    if (foundIdx === -1) {
+      this._refill();
+      foundIdx = this.deck.findIndex(item => item.type === type);
+    }
+
+    const item = this.deck.splice(foundIdx, 1)[0];
+    this.lastShownSrc = item.src;
+    return item;
+  }
+}
+
+window.MediaPool = new MediaPool();
+
+class MediaShow {
+  constructor(containerEl) {
+    this.container = containerEl; // #mediashow-layer
+    this.running = false;
+    this.interval = null;
+    this.activeItems = 0;
+    this.MAX_ITEMS = 3;
+    this.speedLevel = 2; // По умолчанию уровень 2 (редко)
+    this.enabled = true;
+    this.totalShown = 0;
+    this.specialVideoShown = false;
+    this._preloadAssets();
   }
 
   _preloadAssets() {
@@ -164,13 +202,15 @@ class MediaShow {
       return;
     }
     
-    const roll = Math.random();
-    if (roll < 0.65) {
-      this._showImage();
-    } else if (roll < 0.85) {
-      this._showVideo();
-    } else {
+    if (Math.random() < 0.15) {
       this._showEmojiShower();
+    }
+
+    const item = window.MediaPool.getNext();
+    if (item.type === 'video') {
+      this._showVideo(item.src);
+    } else {
+      this._showImage(item.src);
     }
   }
 
@@ -334,8 +374,8 @@ class MediaShow {
     }, { passive: false });
   }
 
-  _showImage() {
-    const src = this._getNextImage();
+  _showImage(srcOverride) {
+    const src = srcOverride || window.MediaPool.getNextOfType('image').src;
     
     const el = document.createElement('img');
     el.src = src;
@@ -443,7 +483,7 @@ class MediaShow {
   }
 
   _showVideo(srcOverride) {
-    const src = srcOverride || this._getNextVideo();
+    const src = srcOverride || window.MediaPool.getNextOfType('video').src;
     
     const videoEl = document.createElement('video');
     videoEl.src = src;
