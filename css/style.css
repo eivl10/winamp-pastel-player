@@ -314,3 +314,29 @@ input[type=range]::-webkit-slider-runnable-track {
   25%        { transform: rotate(8deg)  translateX(6px); }
   75%        { transform: rotate(-4deg) translateX(-4px); }
 }
+
+/* === СЁРФЕР И ОКЕАН === */
+@keyframes surfer-ride {
+  0% { transform: translate(-50px, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; transform: translate(10vw, -20px) rotate(10deg); }
+  25% { transform: translate(30vw, 15px) rotate(-10deg); }
+  45% { transform: translate(50vw, -25px) rotate(15deg); }
+  65% { transform: translate(70vw, 20px) rotate(-15deg); }
+  80% { opacity: 1; transform: translate(85vw, -15px) rotate(20deg); }
+  85% { opacity: 1; transform: translate(90vw, 0px) rotate(60deg); } /* Начало падения */
+  95% { opacity: 0; transform: translate(95vw, 60px) rotate(160deg); } /* Под воду */
+  100% { opacity: 0; transform: translate(100vw, 80px) rotate(180deg); }
+}
+
+@keyframes ocean-wave {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-10px) scaleY(1.05); }
+}
+
+/* === ПТИЦЫ === */
+@keyframes bird-fly {
+  0% { transform: translate(-100px, 20vh) scale(0.5); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translate(110vw, -10vh) scale(0.8); opacity: 0; }
+}

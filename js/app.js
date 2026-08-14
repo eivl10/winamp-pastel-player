@@ -378,21 +378,21 @@ function showTrackChangeBurst(track) {
           if (so) so.style.display = 'none';
           if (typeof screensaver !== 'undefined') screensaver.stop();
 
-          // Фон 1 — Велигама: листья
+          // Фон 1 — Велигама: сёрфер и океан
           if (currentBgIndex === 1) {
             lightningEnabled = false;
             shootingStarsEnabled = false;
-            startLeafSway();
-          // Фон 2 — центр Шри-Ланки: дождь
+            startWeligamaOcean();
+          // Фон 2 — Шри-Ланка: дождь
           } else if (currentBgIndex === 2) {
             lightningEnabled = false;
             shootingStarsEnabled = false;
             startRain();
-          // Фон 3 — Нови Сад: статик
+          // Фон 3 — Нови Сад: деревья и птицы
           } else {
             lightningEnabled = false;
             shootingStarsEnabled = false;
-            stopBgAnimation();
+            startNoviSad();
           }
         };
         img.onerror = () => {
@@ -725,52 +725,124 @@ function showTrackChangeBurst(track) {
     rainInterval = setInterval(() => {
       if (!bgAnimLayer) return;
       const drop = document.createElement('div');
-      const x = 20 + Math.random() * 60;           // центр острова: 20%–80%
-      const duration = 0.8 + Math.random() * 0.6;
-      const size = 1 + Math.random() * 1;
+      const x = Math.random() * 100; // по всему экрану
+      const duration = 0.6 + Math.random() * 0.6;
+      const size = 1 + Math.random() * 1.5;
       drop.style.cssText = `
         position: absolute;
         left: ${x}%;
         top: 0;
         width: ${size}px;
-        height: ${12 + Math.random() * 8}px;
-        background: linear-gradient(180deg, transparent, rgba(180,210,255,0.7));
+        height: ${12 + Math.random() * 15}px;
+        background: linear-gradient(180deg, transparent, rgba(200,220,255,0.6));
         border-radius: 50%;
         animation: rain-fall ${duration}s linear forwards;
       `;
       bgAnimLayer.appendChild(drop);
       setTimeout(() => { if (drop.parentNode) drop.remove(); }, duration * 1000 + 100);
-    }, 30);
+    }, 15); // Чаще спавним для густого дождя
   }
 
-  // Покачивание листьев (фон 1 — Велигама)
-  function startLeafSway() {
+  // Велигама (Океан и сёрфер)
+  let surferInterval = null;
+  function startWeligamaOcean() {
     stopBgAnimation();
     if (!bgAnimLayer) return;
+
+    // Слой океана внизу
+    const ocean = document.createElement('div');
+    ocean.style.cssText = `
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 25vh;
+      background: linear-gradient(180deg, transparent, rgba(0, 119, 190, 0.4) 40%, rgba(0, 80, 140, 0.7));
+      animation: ocean-wave 6s ease-in-out infinite;
+      pointer-events: none;
+    `;
+    bgAnimLayer.appendChild(ocean);
+
+    // Периодический спавн сёрфера
+    surferInterval = setInterval(() => {
+      if (document.hidden) return; // не спавним если вкладка скрыта
+      const surfer = document.createElement('div');
+      surfer.innerHTML = '🏄';
+      surfer.style.cssText = `
+        position: absolute;
+        bottom: 15vh; /* плывет по "океану" */
+        left: -50px;
+        font-size: 40px;
+        animation: surfer-ride 8s linear forwards;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        z-index: 5;
+      `;
+      bgAnimLayer.appendChild(surfer);
+      setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 8500);
+    }, 12000 + Math.random() * 5000); // каждые 12-17 секунд
+  }
+
+  // Нови Сад (Деревья и птицы)
+  let birdInterval = null;
+  function startNoviSad() {
+    stopBgAnimation();
+    if (!bgAnimLayer) return;
+
+    // Деревья по краям (ветки)
     const positions = [
-      { left: '5%',  top: '15%', delay: '0s',   size: 40 },
-      { left: '8%',  top: '30%', delay: '0.5s', size: 30 },
-      { left: '85%', top: '20%', delay: '1s',   size: 45 },
-      { left: '90%', top: '35%', delay: '1.5s', size: 35 },
-      { left: '15%', top: '55%', delay: '0.8s', size: 25 },
-      { left: '80%', top: '60%', delay: '1.2s', size: 28 },
+      { left: '-20px', top: '10%', delay: '0s', size: 80, emoji: '🌳' },
+      { left: '-10px', top: '40%', delay: '1s', size: 60, emoji: '🌿' },
+      { right: '-20px', top: '15%', delay: '0.5s', size: 90, emoji: '🌲' },
+      { right: '-10px', top: '45%', delay: '1.5s', size: 70, emoji: '🌿' }
     ];
     positions.forEach(p => {
-      const leaf = document.createElement('div');
-      leaf.innerHTML = '🌿';
-      leaf.style.cssText = `
+      const tree = document.createElement('div');
+      tree.innerHTML = p.emoji;
+      tree.style.cssText = `
         position: absolute;
-        left: ${p.left};
+        ${p.left ? `left: ${p.left};` : ''}
+        ${p.right ? `right: ${p.right};` : ''}
         top: ${p.top};
         font-size: ${p.size}px;
-        animation: leaf-sway ${3 + Math.random() * 2}s ease-in-out infinite;
+        animation: leaf-sway ${4 + Math.random() * 3}s ease-in-out infinite;
         animation-delay: ${p.delay};
-        opacity: 0.55;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        transform-origin: bottom center;
+        opacity: 0.85;
+        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+        transform-origin: bottom ${p.left ? 'left' : 'right'};
       `;
-      bgAnimLayer.appendChild(leaf);
+      bgAnimLayer.appendChild(tree);
     });
+
+    // Периодический пролёт птиц
+    birdInterval = setInterval(() => {
+      if (document.hidden) return;
+      const birdCount = 1 + Math.floor(Math.random() * 3); // стайка из 1-3 птиц
+      for (let i = 0; i < birdCount; i++) {
+        setTimeout(() => {
+          const bird = document.createElement('div');
+          bird.innerHTML = '🐦';
+          const startY = 10 + Math.random() * 30; // верхняя часть неба
+          bird.style.cssText = `
+            position: absolute;
+            top: ${startY}vh;
+            left: -50px;
+            font-size: 24px;
+            animation: bird-fly ${6 + Math.random() * 3}s linear forwards;
+            opacity: 0.6;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+            transform: scaleX(-1); /* птица смотрит вправо */
+          `;
+          bgAnimLayer.appendChild(bird);
+          setTimeout(() => { if (bird.parentNode) bird.remove(); }, 9500);
+        }, i * 400); // небольшая задержка между птицами в стайке
+      }
+    }, 15000 + Math.random() * 10000); // каждые 15-25 секунд
   }
+
+  // Обновлённая очистка интервалов
+  const originalStopBg = stopBgAnimation;
+  stopBgAnimation = function() {
+    originalStopBg();
+    if (surferInterval) { clearInterval(surferInterval); surferInterval = null; }
+    if (birdInterval) { clearInterval(birdInterval); birdInterval = null; }
+  };
 
 });
