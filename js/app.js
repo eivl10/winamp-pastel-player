@@ -713,45 +713,6 @@ function showTrackChangeBurst(track) {
   const originalStopBg = stopBgAnimation;
   stopBgAnimation = function() {
     originalStopBg();
-  };p-shadow(0 5px 15px rgba(0,0,0,0.6));
-        transform-origin: ${p.left ? '0% 100%' : '100% 100%'};
-      `;
-      if (p.flip) tree.querySelector('svg').style.transform = 'scaleX(-1)';
-      bgAnimLayer.appendChild(tree);
-    });
-
-    // Периодический пролёт птиц
-    birdInterval = setInterval(() => {
-      if (document.hidden) return;
-      const birdCount = 1 + Math.floor(Math.random() * 3); // стайка из 1-3 птиц
-      for (let i = 0; i < birdCount; i++) {
-        setTimeout(() => {
-          const bird = document.createElement('div');
-          bird.innerHTML = '🐦';
-          const startY = 10 + Math.random() * 30; // верхняя часть неба
-          bird.style.cssText = `
-            position: absolute;
-            top: ${startY}vh;
-            left: -50px;
-            font-size: 24px;
-            animation: bird-fly ${6 + Math.random() * 3}s linear forwards;
-            opacity: 0.6;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
-            transform: scaleX(-1); /* птица смотрит вправо */
-          `;
-          bgAnimLayer.appendChild(bird);
-          setTimeout(() => { if (bird.parentNode) bird.remove(); }, 9500);
-        }, i * 400); // небольшая задержка между птицами в стайке
-      }
-    }, 15000 + Math.random() * 10000); // каждые 15-25 секунд
-  }
-
-  // Обновлённая очистка интервалов
-  const originalStopBg = stopBgAnimation;
-  stopBgAnimation = function() {
-    originalStopBg();
-    if (surferInterval) { clearInterval(surferInterval); surferInterval = null; }
-    if (birdInterval) { clearInterval(birdInterval); birdInterval = null; }
   };
 
 });
