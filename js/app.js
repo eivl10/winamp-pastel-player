@@ -293,9 +293,9 @@ function showTrackChangeBurst(track) {
   const blobBg = document.querySelector('.blob-bg');
   const BACKGROUNDS = [
     null,
-    'assets/images/weligama_bg.jpg',
-    'assets/images/srilanka_bg.jpg',
-    'assets/images/novisad_bg.jpg',
+    '/assets/images/weligama_bg.jpg',
+    '/assets/images/srilanka_bg.jpg',
+    '/assets/images/novisad_bg.jpg',
   ];
   let currentBgIndex = 0;
 
@@ -305,27 +305,28 @@ function showTrackChangeBurst(track) {
       const src = BACKGROUNDS[currentBgIndex];
 
       if (src) {
-        // Предзагружаем картинку перед показом
         const img = new Image();
         img.onload = () => {
-          bgLayer.style.backgroundImage = `url('${src}')`;
+          bgLayer.style.backgroundImage = `url("${src}")`;
           bgLayer.classList.add('visible');
           if (blobBg) blobBg.style.opacity = '0';
           toggleBackground.classList.add('active');
         };
         img.onerror = () => {
-          console.warn('BG image failed to load:', src);
+          console.error('BG image failed to load:', src);
+          // Пропускаем к следующему
+          currentBgIndex = (currentBgIndex + 1) % BACKGROUNDS.length;
         };
         img.src = src;
       } else {
-        // Возврат к дефолтному (blobs)
         bgLayer.classList.remove('visible');
-        // Даём transition отработать, потом чистим src
         setTimeout(() => { bgLayer.style.backgroundImage = ''; }, 650);
         if (blobBg) blobBg.style.opacity = '';
         toggleBackground.classList.remove('active');
       }
     });
+  } else {
+    console.warn('BG switcher: missing element', { toggleBackground, bgLayer });
   }
 
   // 6. Initialization Logic
