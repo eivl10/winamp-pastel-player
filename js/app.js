@@ -291,11 +291,13 @@ function showTrackChangeBurst(track) {
   const toggleBackground = document.getElementById('toggle-background');
   const bgLayer = document.getElementById('bg-layer');
   const blobBg = document.querySelector('.blob-bg');
+  // Вычисляем базовый путь — работает и при file://, и при http://
+  const _base = window.location.href.replace(/\/[^\/]*$/, '/');
   const BACKGROUNDS = [
     null,
-    '/assets/images/weligama_bg.jpg',
-    '/assets/images/srilanka_bg.jpg',
-    '/assets/images/novisad_bg.jpg',
+    _base + 'assets/images/weligama_bg.jpg',
+    _base + 'assets/images/srilanka_bg.jpg',
+    _base + 'assets/images/novisad_bg.jpg',
   ];
   let currentBgIndex = 0;
 
