@@ -761,23 +761,40 @@ function showTrackChangeBurst(track) {
     `;
     bgAnimLayer.appendChild(ocean);
 
-    // Периодический спавн сёрфера
+    // Периодический спавн сёрферов
     surferInterval = setInterval(() => {
-      if (document.hidden) return; // не спавним если вкладка скрыта
-      const surfer = document.createElement('div');
-      surfer.innerHTML = '🏄';
-      surfer.style.cssText = `
-        position: absolute;
-        bottom: 15vh; /* плывет по "океану" */
-        left: -50px;
-        font-size: 40px;
-        animation: surfer-ride 8s linear forwards;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
-        z-index: 5;
-      `;
-      bgAnimLayer.appendChild(surfer);
-      setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 8500);
-    }, 12000 + Math.random() * 5000); // каждые 12-17 секунд
+      if (document.hidden) return;
+      const count = Math.random() > 0.7 ? 2 : 1; // иногда 2 сёрфера
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const surfer = document.createElement('div');
+          // Реалистичный SVG сёрфера с анимированными руками и балансировкой
+          surfer.innerHTML = `
+            <svg viewBox="0 0 100 100" width="80" height="80">
+              <path d="M 5 70 Q 50 85 95 70 Q 50 60 5 70" fill="#E2ECF6" opacity="0.9"/>
+              <g class="surfer-body">
+                <line x1="30" y1="70" x2="45" y2="45" stroke="#101820" stroke-width="5" stroke-linecap="round"/>
+                <line x1="70" y1="70" x2="55" y2="45" stroke="#101820" stroke-width="5" stroke-linecap="round"/>
+                <line x1="50" y1="45" x2="55" y2="25" stroke="#101820" stroke-width="7" stroke-linecap="round"/>
+                <line x1="55" y1="30" x2="25" y2="35" stroke="#101820" stroke-width="4" stroke-linecap="round" class="surfer-arm-left"/>
+                <line x1="55" y1="30" x2="85" y2="20" stroke="#101820" stroke-width="4" stroke-linecap="round" class="surfer-arm-right"/>
+                <circle cx="58" cy="15" r="7" fill="#101820"/>
+              </g>
+            </svg>
+          `;
+          surfer.style.cssText = `
+            position: absolute;
+            bottom: 12vh;
+            left: -100px;
+            animation: surfer-ride ${7 + Math.random() * 2}s linear forwards;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+            z-index: 5;
+          `;
+          bgAnimLayer.appendChild(surfer);
+          setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 9000);
+        }, i * (1000 + Math.random() * 2000));
+      }
+    }, 10000 + Math.random() * 5000); // каждые 10-15 секунд
   }
 
   // Нови Сад (Деревья и птицы)
@@ -786,28 +803,40 @@ function showTrackChangeBurst(track) {
     stopBgAnimation();
     if (!bgAnimLayer) return;
 
-    // Деревья по краям (ветки)
+    // Деревья по краям (реалистичные SVG силуэты крон)
+    const treeSVG = `
+      <svg viewBox="0 0 200 200" width="100%" height="100%">
+        <path d="M0,200 Q50,150 100,100 Q120,80 200,0 Q130,50 100,80 Q50,100 0,200" stroke="#050A10" stroke-width="8" fill="none"/>
+        <circle cx="100" cy="100" r="45" fill="#0A121A" opacity="0.95"/>
+        <circle cx="150" cy="50" r="35" fill="#050A10" opacity="0.9"/>
+        <circle cx="120" cy="30" r="25" fill="#070D14" opacity="0.95"/>
+        <circle cx="60" cy="130" r="40" fill="#050A10" opacity="0.9"/>
+        <circle cx="80" cy="70" r="50" fill="#0A121A" opacity="0.85"/>
+        <circle cx="170" cy="80" r="20" fill="#050A10" opacity="0.9"/>
+      </svg>
+    `;
     const positions = [
-      { left: '-20px', top: '10%', delay: '0s', size: 80, emoji: '🌳' },
-      { left: '-10px', top: '40%', delay: '1s', size: 60, emoji: '🌿' },
-      { right: '-20px', top: '15%', delay: '0.5s', size: 90, emoji: '🌲' },
-      { right: '-10px', top: '45%', delay: '1.5s', size: 70, emoji: '🌿' }
+      { left: '-40px', top: '5%', delay: '0s', size: 250, flip: false },
+      { left: '-20px', top: '40%', delay: '1s', size: 180, flip: false },
+      { right: '-40px', top: '10%', delay: '0.5s', size: 300, flip: true },
+      { right: '-20px', top: '50%', delay: '1.5s', size: 200, flip: true }
     ];
     positions.forEach(p => {
       const tree = document.createElement('div');
-      tree.innerHTML = p.emoji;
+      tree.innerHTML = treeSVG;
       tree.style.cssText = `
         position: absolute;
         ${p.left ? `left: ${p.left};` : ''}
         ${p.right ? `right: ${p.right};` : ''}
         top: ${p.top};
-        font-size: ${p.size}px;
+        width: ${p.size}px;
+        height: ${p.size}px;
         animation: leaf-sway ${4 + Math.random() * 3}s ease-in-out infinite;
         animation-delay: ${p.delay};
-        opacity: 0.85;
-        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
-        transform-origin: bottom ${p.left ? 'left' : 'right'};
+        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.6));
+        transform-origin: ${p.left ? '0% 100%' : '100% 100%'};
       `;
+      if (p.flip) tree.querySelector('svg').style.transform = 'scaleX(-1)';
       bgAnimLayer.appendChild(tree);
     });
 

@@ -333,6 +333,33 @@ input[type=range]::-webkit-slider-runnable-track {
   50% { transform: translateY(-10px) scaleY(1.05); }
 }
 
+/* === ВНУТРЕННЯЯ АНИМАЦИЯ СЁРФЕРА === */
+@keyframes surfer-balance {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-3px) rotate(-3deg); }
+  75% { transform: translateY(2px) rotate(5deg); }
+}
+@keyframes surfer-arm-l {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-15deg); }
+}
+@keyframes surfer-arm-r {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(20deg); }
+}
+.surfer-body {
+  animation: surfer-balance 1.5s ease-in-out infinite;
+  transform-origin: 50px 70px;
+}
+.surfer-arm-left {
+  animation: surfer-arm-l 2s ease-in-out infinite;
+  transform-origin: 55px 35px;
+}
+.surfer-arm-right {
+  animation: surfer-arm-r 2.2s ease-in-out infinite;
+  transform-origin: 55px 35px;
+}
+
 /* === ПТИЦЫ === */
 @keyframes bird-fly {
   0% { transform: translate(-100px, 20vh) scale(0.5); opacity: 0; }
