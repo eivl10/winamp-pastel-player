@@ -49,7 +49,48 @@ class MediaShow {
     this.enabled = true;
     this.totalShown = 0;
     this.specialVideoShown = false;
+    this.imagePool = [];
+    this.videoPool = [];
+    this.lastImageSrc = null;
+    this.lastVideoSrc = null;
     this._preloadAssets();
+  }
+
+  _shuffle(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  _getNextImage() {
+    if (!this.imagePool || this.imagePool.length === 0) {
+      const shuffled = this._shuffle(MEDIA_IMAGES);
+      if (this.lastImageSrc && shuffled.length > 1 && shuffled[shuffled.length - 1] === this.lastImageSrc) {
+        const swapIdx = Math.floor(Math.random() * (shuffled.length - 1));
+        [shuffled[shuffled.length - 1], shuffled[swapIdx]] = [shuffled[swapIdx], shuffled[shuffled.length - 1]];
+      }
+      this.imagePool = shuffled;
+    }
+    const src = this.imagePool.pop();
+    this.lastImageSrc = src;
+    return src;
+  }
+
+  _getNextVideo() {
+    if (!this.videoPool || this.videoPool.length === 0) {
+      const shuffled = this._shuffle(MEDIA_VIDEOS);
+      if (this.lastVideoSrc && shuffled.length > 1 && shuffled[shuffled.length - 1] === this.lastVideoSrc) {
+        const swapIdx = Math.floor(Math.random() * (shuffled.length - 1));
+        [shuffled[shuffled.length - 1], shuffled[swapIdx]] = [shuffled[swapIdx], shuffled[shuffled.length - 1]];
+      }
+      this.videoPool = shuffled;
+    }
+    const src = this.videoPool.pop();
+    this.lastVideoSrc = src;
+    return src;
   }
 
   _preloadAssets() {
@@ -294,7 +335,7 @@ class MediaShow {
   }
 
   _showImage() {
-    const src = MEDIA_IMAGES[Math.floor(Math.random() * MEDIA_IMAGES.length)];
+    const src = this._getNextImage();
     
     const el = document.createElement('img');
     el.src = src;
@@ -402,7 +443,7 @@ class MediaShow {
   }
 
   _showVideo(srcOverride) {
-    const src = srcOverride || MEDIA_VIDEOS[Math.floor(Math.random() * MEDIA_VIDEOS.length)];
+    const src = srcOverride || this._getNextVideo();
     
     const videoEl = document.createElement('video');
     videoEl.src = src;
