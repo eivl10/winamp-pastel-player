@@ -378,21 +378,21 @@ function showTrackChangeBurst(track) {
           if (so) so.style.display = 'none';
           if (typeof screensaver !== 'undefined') screensaver.stop();
 
-          // Фон 1 — Велигама: статик (невозможно анимировать JPG)
+          // Фон 1 — Велигама: сёрферы
           if (currentBgIndex === 1) {
             lightningEnabled = false;
             shootingStarsEnabled = false;
-            stopBgAnimation();
-          // Фон 2 — Шри-Ланка: дождь
+            startWeligamaSurfers();
+          // Фон 2 — Шри-Ланка: дождь и облака
           } else if (currentBgIndex === 2) {
             lightningEnabled = false;
             shootingStarsEnabled = false;
-            startRain();
-          // Фон 3 — Нови Сад: статик
+            startSriLankaRain();
+          // Фон 3 — Нови Сад: лодки
           } else {
             lightningEnabled = false;
             shootingStarsEnabled = false;
-            stopBgAnimation();
+            startNoviSadBoats();
           }
         };
         img.onerror = () => {
@@ -714,25 +714,67 @@ function showTrackChangeBurst(track) {
   const bgAnimLayer = document.getElementById('bg-animation-layer');
 
   // Остановка всех фоновых анимаций
+  let genElementIntervals = [];
   function stopBgAnimation() {
     if (bgAnimLayer) bgAnimLayer.innerHTML = '';
     if (typeof rainInterval !== 'undefined' && rainInterval) { clearInterval(rainInterval); rainInterval = null; }
+    genElementIntervals.forEach(i => clearInterval(i));
+    genElementIntervals = [];
   }
 
-  // Дождь (фон 2 — центр Шри-Ланки)
-  function startRain() {
+  // Велигама (Сёрферы)
+  function startWeligamaSurfers() {
+    stopBgAnimation();
+    if (!bgAnimLayer) return;
+    const interval = setInterval(() => {
+      if (document.hidden) return;
+      const count = Math.random() > 0.6 ? 2 : 1;
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const surfer = document.createElement('div');
+          surfer.className = 'gen-element gen-surfer';
+          surfer.style.backgroundImage = 'url("assets/images/surfer_element.jpg")';
+          surfer.style.bottom = (20 + Math.random() * 15) + 'vh';
+          bgAnimLayer.appendChild(surfer);
+          setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 16000);
+        }, i * (1500 + Math.random() * 2000));
+      }
+    }, 12000 + Math.random() * 8000);
+    genElementIntervals.push(interval);
+  }
+
+  // Нови Сад (Лодки)
+  function startNoviSadBoats() {
+    stopBgAnimation();
+    if (!bgAnimLayer) return;
+    const interval = setInterval(() => {
+      if (document.hidden) return;
+      const boat = document.createElement('div');
+      boat.className = 'gen-element gen-boat';
+      boat.style.backgroundImage = 'url("assets/images/boat_element.jpg")';
+      boat.style.bottom = (10 + Math.random() * 10) + 'vh'; // на реке внизу
+      bgAnimLayer.appendChild(boat);
+      setTimeout(() => { if (boat.parentNode) boat.remove(); }, 36000);
+    }, 15000 + Math.random() * 10000);
+    genElementIntervals.push(interval);
+  }
+
+  // Дождь и облака (фон 2 — центр Шри-Ланки)
+  function startSriLankaRain() {
+    stopBgAnimation();
+    if (!bgAnimLayer) return;
+    // Дождь
     rainInterval = setInterval(() => {
-      if (!bgAnimLayer) return;
       const drop = document.createElement('div');
-      const x = Math.random() * 100; // по всему экрану
-      const duration = 0.5 + Math.random() * 0.4; // быстрее
-      const size = 2 + Math.random() * 2; // крупнее
+      const x = Math.random() * 100;
+      const duration = 0.5 + Math.random() * 0.4;
+      const size = 2 + Math.random() * 2;
       drop.style.cssText = `
         position: absolute;
         left: ${x}%;
         top: 0;
         width: ${size}px;
-        height: ${20 + Math.random() * 20}px; // длиннее
+        height: ${20 + Math.random() * 20}px;
         background: linear-gradient(180deg, transparent, rgba(255,255,255,0.7));
         border-radius: 50%;
         animation: rain-fall ${duration}s linear forwards;
@@ -740,6 +782,18 @@ function showTrackChangeBurst(track) {
       bgAnimLayer.appendChild(drop);
       setTimeout(() => { if (drop.parentNode) drop.remove(); }, duration * 1000 + 100);
     }, 15);
+
+    // Облака
+    const cloudInterval = setInterval(() => {
+      if (document.hidden) return;
+      const cloud = document.createElement('div');
+      cloud.className = 'gen-element gen-cloud';
+      cloud.style.backgroundImage = 'url("assets/images/cloud_element.jpg")';
+      cloud.style.top = (2 + Math.random() * 15) + 'vh'; // в небе
+      bgAnimLayer.appendChild(cloud);
+      setTimeout(() => { if (cloud.parentNode) cloud.remove(); }, 46000);
+    }, 12000 + Math.random() * 10000);
+    genElementIntervals.push(cloudInterval);
   }
 
   // Обновлённая очистка интервалов

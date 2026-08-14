@@ -367,3 +367,51 @@ input[type=range]::-webkit-slider-runnable-track {
   90% { opacity: 0.6; }
   100% { transform: translate(110vw, -10vh) scale(0.8); opacity: 0; }
 }
+
+/* === СГЕНЕРИРОВАННЫЕ ЭЛЕМЕНТЫ (mix-blend-mode) === */
+@keyframes gen-surfer-ride {
+  0% { transform: translate(-15vw, 0); opacity: 0; }
+  10% { opacity: 0.9; transform: translate(5vw, 5px); }
+  90% { opacity: 0.9; transform: translate(85vw, -5px); }
+  100% { opacity: 0; transform: translate(105vw, 0); }
+}
+@keyframes gen-boat-float {
+  0% { transform: translate(105vw, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.9; }
+  90% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-15vw, 0) rotate(-2deg); }
+}
+@keyframes gen-cloud-drift {
+  0% { transform: translate(-25vw, 0) scale(1); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(110vw, 0) scale(1.1); }
+}
+
+.gen-element {
+  position: absolute;
+  pointer-events: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.gen-surfer {
+  width: 150px;
+  height: 150px;
+  bottom: 25vh;
+  mix-blend-mode: multiply; /* белый фон растворяется */
+  animation: gen-surfer-ride 15s linear forwards;
+}
+.gen-boat {
+  width: 250px;
+  height: 150px;
+  bottom: 20vh;
+  mix-blend-mode: multiply; /* белый фон растворяется */
+  animation: gen-boat-float 35s linear forwards;
+}
+.gen-cloud {
+  width: 300px;
+  height: 200px;
+  mix-blend-mode: screen; /* чёрный фон растворяется */
+  animation: gen-cloud-drift 45s linear forwards;
+}
