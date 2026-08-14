@@ -723,7 +723,9 @@ function showTrackChangeBurst(track) {
 
   // Остановка всех фоновых анимаций
   let genElementIntervals = [];
+  let bgAnimActive = false;
   function stopBgAnimation() {
+    bgAnimActive = false;
     if (bgAnimLayer) bgAnimLayer.innerHTML = '';
     if (typeof rainInterval !== 'undefined' && rainInterval) { clearInterval(rainInterval); rainInterval = null; }
     genElementIntervals.forEach(i => clearInterval(i));
@@ -733,6 +735,7 @@ function showTrackChangeBurst(track) {
   // Велигама (Сёрферы)
   function startWeligamaSurfers() {
     stopBgAnimation();
+    bgAnimActive = true;
     if (!bgAnimLayer) return;
 
     function spawnSurfersWave() {
@@ -741,17 +744,25 @@ function showTrackChangeBurst(track) {
       const count = Math.floor(Math.random() * 3) + 1;
       for (let i = 0; i < count; i++) {
         setTimeout(() => {
-          if (currentBgIndex !== 1) return;
+          if (!bgAnimActive || currentBgIndex !== 1) return;
           const surfer = document.createElement('div');
           surfer.className = 'gen-element gen-surfer';
           surfer.style.backgroundImage = 'url("assets/images/surfer_element.png")';
-          surfer.style.bottom = (15 + Math.random() * 25) + 'vh';
-          // Разные цвета плавок и досок для "разных" сёрферов
+          // Perspective: smaller surfers appear farther away
+          const scale = 0.65 + Math.random() * 0.65; // 0.65 to 1.3
+          const depthOpacity = 0.5 + scale * 0.4;    // smaller = more transparent
+          const bottomPos = 15 + Math.random() * 25; // vh
+          surfer.style.bottom = bottomPos + 'vh';
           const hue = Math.floor(Math.random() * 360);
-          surfer.style.filter = `hue-rotate(${hue}deg)`;
-          
+          const animDuration = 18 + Math.floor(Math.random() * 8); // 18-26s
+          surfer.style.width = Math.round(130 * scale) + 'px';
+          surfer.style.height = Math.round(130 * scale) + 'px';
+          surfer.style.filter = `hue-rotate(${hue}deg) drop-shadow(0 4px 8px rgba(0,150,255,0.4))`;
+          surfer.style.opacity = depthOpacity;
+          surfer.style.animationDuration = animDuration + 's';
+
           bgAnimLayer.appendChild(surfer);
-          setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 21000);
+          setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, (animDuration + 3) * 1000);
         }, i * (800 + Math.random() * 1500));
       }
     }
@@ -764,21 +775,28 @@ function showTrackChangeBurst(track) {
   // Нови Сад (Лодки)
   function startNoviSadBoats() {
     stopBgAnimation();
+    bgAnimActive = true;
     if (!bgAnimLayer) return;
 
     function spawnBoat() {
-      if (currentBgIndex !== 3 || document.hidden) return;
+      if (!bgAnimActive || currentBgIndex !== 3 || document.hidden) return;
       const boat = document.createElement('div');
       boat.className = 'gen-element gen-boat';
       boat.style.backgroundImage = 'url("assets/images/boat_element.png")';
-      boat.style.bottom = (20 + Math.random() * 15) + 'vh'; 
-      // Разные оттенки лодок
-      const hue = Math.floor(Math.random() * 40) - 20;
-      boat.style.filter = `hue-rotate(${hue}deg)`;
+      const boatScale = 0.6 + Math.random() * 0.7; // 0.6 to 1.3
+      const boatBottom = 5 + Math.random() * 12;
+      boat.style.bottom = boatBottom + 'vh';
+      const hue = Math.floor(Math.random() * 60) - 30;
+      const animDuration = 42 + Math.floor(Math.random() * 12); // 42-54s
+      boat.style.width = Math.round(220 * boatScale) + 'px';
+      boat.style.height = Math.round(120 * boatScale) + 'px';
+      boat.style.filter = `hue-rotate(${hue}deg) drop-shadow(0 8px 12px rgba(0,0,0,0.5))`;
       boat.style.zIndex = '10';
-      
+      boat.style.opacity = 0.6 + boatScale * 0.3;
+      boat.style.animationDuration = animDuration + 's';
+
       bgAnimLayer.appendChild(boat);
-      setTimeout(() => { if (boat.parentNode) boat.remove(); }, 46000);
+      setTimeout(() => { if (boat.parentNode) boat.remove(); }, (animDuration + 3) * 1000);
     }
 
     spawnBoat();
@@ -789,21 +807,26 @@ function showTrackChangeBurst(track) {
   // Дождь и облака (фон 2 — центр Шри-Ланки)
   function startSriLankaRain() {
     stopBgAnimation();
+    bgAnimActive = true;
     if (!bgAnimLayer) return;
     // Дождь
     rainInterval = setInterval(() => {
+      if (!bgAnimActive) return;
       const drop = document.createElement('div');
       const x = Math.random() * 100;
       const duration = 0.5 + Math.random() * 0.4;
       const size = 2 + Math.random() * 2;
+      const windOffset = 8 + Math.random() * 10; // px horizontal drift
+      const opacity = 0.4 + Math.random() * 0.4;
       drop.style.cssText = `
         position: absolute;
         left: ${x}%;
-        top: 0;
+        top: -5px;
         width: ${size}px;
-        height: ${20 + Math.random() * 20}px;
-        background: linear-gradient(180deg, transparent, rgba(255,255,255,0.7));
-        border-radius: 50%;
+        height: ${22 + Math.random() * 18}px;
+        background: linear-gradient(170deg, transparent 0%, rgba(200,230,255,${opacity}) 100%);
+        border-radius: 2px;
+        transform: rotate(10deg);
         animation: rain-fall ${duration}s linear forwards;
       `;
       bgAnimLayer.appendChild(drop);
@@ -824,11 +847,5 @@ function showTrackChangeBurst(track) {
     }, 4000 + Math.random() * 5000); // Спавн очень частый
     genElementIntervals.push(cloudInterval);
   }
-
-  // Обновлённая очистка интервалов
-  const originalStopBg = stopBgAnimation;
-  stopBgAnimation = function() {
-    originalStopBg();
-  };
 
 });
