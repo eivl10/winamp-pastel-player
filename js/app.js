@@ -738,6 +738,32 @@ function showTrackChangeBurst(track) {
     bgAnimActive = true;
     if (!bgAnimLayer) return;
 
+    // Живой эффект воды — бегущие пены/блики
+    function spawnFoam() {
+      if (!bgAnimActive || currentBgIndex !== 1) return;
+      const foam = document.createElement('div');
+      const foamY = 20 + Math.random() * 20; // vh - зона волн
+      const foamW = 40 + Math.random() * 80; // px
+      const dur = 3 + Math.random() * 3; // s
+      foam.style.cssText = `
+        position: absolute;
+        left: ${Math.random() * 90}%;
+        bottom: ${foamY}vh;
+        width: ${foamW}px;
+        height: 4px;
+        background: rgba(255,255,255,0.6);
+        border-radius: 50%;
+        filter: blur(2px);
+        animation: foam-drift ${dur}s ease-out forwards;
+        pointer-events: none;
+      `;
+      bgAnimLayer.appendChild(foam);
+      setTimeout(() => { if (foam.parentNode) foam.remove(); }, dur * 1000 + 200);
+    }
+    const foamInterval = setInterval(spawnFoam, 400);
+    genElementIntervals.push(foamInterval);
+    spawnFoam();
+
     function spawnSurfersWave() {
       if (currentBgIndex !== 1 || document.hidden) return;
       // Спавним от 1 до 3 сёрферов одновременно
@@ -745,24 +771,38 @@ function showTrackChangeBurst(track) {
       for (let i = 0; i < count; i++) {
         setTimeout(() => {
           if (!bgAnimActive || currentBgIndex !== 1) return;
+
+          // 3 разных SVG-сёрфера (вместо PNG с белым фоном)
+          const SURFER_SVGS = [
+            // Сёрфер 1 — красная доска, синие шорты
+            `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'><ellipse cx='50' cy='78' rx='42' ry='7' fill='%23FF6B6B'/><ellipse cx='15' cy='78' rx='10' ry='3' fill='rgba(255,255,255,0.7)'/><rect x='46' y='42' width='8' height='22' rx='4' fill='%23FFDAA0'/><circle cx='50' cy='33' r='9' fill='%23FFDAA0'/><line x1='46' y1='50' x2='28' y2='44' stroke='%23FFDAA0' stroke-width='5' stroke-linecap='round'/><line x1='54' y1='50' x2='72' y2='46' stroke='%23FFDAA0' stroke-width='5' stroke-linecap='round'/><rect x='44' y='62' width='6' height='14' rx='3' fill='%233B5BDB'/><rect x='50' y='62' width='6' height='14' rx='3' fill='%233B5BDB'/><circle cx='50' cy='26' r='4' fill='%23111' opacity='0.7'/></svg>`,
+            // Сёрфер 2 — жёлтая доска, зелёные шорты, длинные волосы
+            `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'><ellipse cx='50' cy='78' rx='42' ry='7' fill='%23FFD166'/><ellipse cx='15' cy='78' rx='10' ry='3' fill='rgba(255,255,255,0.7)'/><rect x='46' y='42' width='8' height='22' rx='4' fill='%23C68642'/><circle cx='50' cy='33' r='9' fill='%23C68642'/><path d='M43 28 Q50 18 57 28' fill='%23222'/><line x1='46' y1='48' x2='26' y2='42' stroke='%23C68642' stroke-width='5' stroke-linecap='round'/><line x1='54' y1='48' x2='74' y2='43' stroke='%23C68642' stroke-width='5' stroke-linecap='round'/><rect x='44' y='62' width='6' height='14' rx='3' fill='%232ECC40'/><rect x='50' y='62' width='6' height='14' rx='3' fill='%232ECC40'/></svg>`,
+            // Сёрфер 3 — фиолетовая доска, белый топ
+            `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'><ellipse cx='50' cy='78' rx='42' ry='7' fill='%23A855F7'/><ellipse cx='15' cy='78' rx='10' ry='3' fill='rgba(255,255,255,0.7)'/><rect x='45' y='41' width='10' height='24' rx='5' fill='white'/><circle cx='50' cy='32' r='9' fill='%23FFDAA0'/><line x1='45' y1='49' x2='25' y2='43' stroke='white' stroke-width='5' stroke-linecap='round'/><line x1='55' y1='49' x2='75' y2='44' stroke='white' stroke-width='5' stroke-linecap='round'/><rect x='44' y='63' width='6' height='14' rx='3' fill='%23FF6B6B'/><rect x='50' y='63' width='6' height='14' rx='3' fill='%23FF6B6B'/></svg>`
+          ];
+
+          const scale = 0.7 + Math.random() * 0.6;
+          const depthOpacity = 0.6 + scale * 0.3;
+          const bottomPos = 18 + Math.random() * 20;
+          const animDuration = 20 + Math.floor(Math.random() * 8);
+          const svgIdx = Math.floor(Math.random() * SURFER_SVGS.length);
+
           const surfer = document.createElement('div');
           surfer.className = 'gen-element gen-surfer';
-          surfer.style.backgroundImage = 'url("assets/images/surfer_element.png")';
-          // Perspective: smaller surfers appear farther away
-          const scale = 0.65 + Math.random() * 0.65; // 0.65 to 1.3
-          const depthOpacity = 0.5 + scale * 0.4;    // smaller = more transparent
-          const bottomPos = 15 + Math.random() * 25; // vh
           surfer.style.bottom = bottomPos + 'vh';
-          const hue = Math.floor(Math.random() * 360);
-          const animDuration = 18 + Math.floor(Math.random() * 8); // 18-26s
-          surfer.style.width = Math.round(130 * scale) + 'px';
-          surfer.style.height = Math.round(130 * scale) + 'px';
-          surfer.style.filter = `hue-rotate(${hue}deg) drop-shadow(0 4px 8px rgba(0,150,255,0.4))`;
           surfer.style.opacity = depthOpacity;
           surfer.style.animationDuration = animDuration + 's';
+          surfer.style.width = Math.round(120 * scale) + 'px';
+          surfer.style.height = Math.round(120 * scale) + 'px';
 
+          const inner = document.createElement('div');
+          inner.className = 'surfer-inner';
+          inner.style.backgroundImage = `url("${SURFER_SVGS[svgIdx]}")`;
+
+          surfer.appendChild(inner);
           bgAnimLayer.appendChild(surfer);
-          setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, (animDuration + 3) * 1000);
+          setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, (animDuration + 4) * 1000);
         }, i * (800 + Math.random() * 1500));
       }
     }
@@ -780,23 +820,37 @@ function showTrackChangeBurst(track) {
 
     function spawnBoat() {
       if (!bgAnimActive || currentBgIndex !== 3 || document.hidden) return;
+      // 3 разных SVG-лодки
+      const BOAT_SVGS = [
+        // Лодка 1 — деревянная весельная лодка
+        `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><path d='M10 45 Q100 35 190 45 L175 65 Q100 70 25 65 Z' fill='%23C8A96E'/><path d='M10 45 Q100 35 190 45' fill='none' stroke='%23A0784A' stroke-width='3'/><rect x='85' y='20' width='30' height='25' rx='3' fill='%23E8D5B0' stroke='%23A0784A' stroke-width='2'/><rect x='88' y='23' width='10' height='8' rx='1' fill='%2387CEEB' opacity='0.8'/><rect x='102' y='23' width='10' height='8' rx='1' fill='%2387CEEB' opacity='0.8'/><line x1='30' y1='50' x2='10' y2='40' stroke='%23A0784A' stroke-width='3' stroke-linecap='round'/><line x1='165' y1='50' x2='185' y2='40' stroke='%23A0784A' stroke-width='3' stroke-linecap='round'/></svg>`,
+        // Лодка 2 — синяя моторная лодка
+        `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70'><path d='M5 42 Q100 30 195 42 L185 60 Q100 68 15 60 Z' fill='%231E90FF'/><path d='M5 42 Q100 30 195 42' fill='none' stroke='%230066CC' stroke-width='2'/><path d='M50 42 Q100 28 150 42 L140 30 Q100 20 60 30 Z' fill='white' opacity='0.9'/><rect x='130' y='25' width='35' height='20' rx='4' fill='%23555'/><circle cx='175' cy='50' r='6' fill='%23333'/><ellipse cx='185' cy='55' rx='8' ry='3' fill='rgba(255,255,255,0.5)'/></svg>`,
+        // Лодка 3 — красно-белый катер с флагом
+        `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><path d='M15 48 Q100 36 185 48 L170 68 Q100 75 30 68 Z' fill='%23CC2200'/><path d='M15 48 Q100 36 185 48' fill='none' stroke='%23990000' stroke-width='3'/><path d='M30 48 L30 30' stroke='%23666' stroke-width='2'/><rect x='30' y='20' width='18' height='10' fill='%2300CC44'/><rect x='70' y='32' width='70' height='18' rx='3' fill='white' stroke='%23CC2200' stroke-width='2'/><rect x='73' y='35' width='20' height='6' rx='1' fill='%2387CEEB' opacity='0.8'/><rect x='97' y='35' width='20' height='6' rx='1' fill='%2387CEEB' opacity='0.8'/><ellipse cx='190' cy='58' rx='6' ry='2' fill='rgba(255,255,255,0.6)'/></svg>`
+      ];
+
+      const boatScale = 0.55 + Math.random() * 0.6;
+      const boatBottom = 1 + Math.random() * 6; // ОЧЕНЬ низко — на реке
+      const animDuration = 44 + Math.floor(Math.random() * 14);
+      const svgIdx = Math.floor(Math.random() * BOAT_SVGS.length);
+
       const boat = document.createElement('div');
       boat.className = 'gen-element gen-boat';
-      boat.style.backgroundImage = 'url("assets/images/boat_element.png")';
-      const boatScale = 0.6 + Math.random() * 0.7; // 0.6 to 1.3
-      const boatBottom = 5 + Math.random() * 12;
       boat.style.bottom = boatBottom + 'vh';
-      const hue = Math.floor(Math.random() * 60) - 30;
-      const animDuration = 42 + Math.floor(Math.random() * 12); // 42-54s
-      boat.style.width = Math.round(220 * boatScale) + 'px';
-      boat.style.height = Math.round(120 * boatScale) + 'px';
-      boat.style.filter = `hue-rotate(${hue}deg) drop-shadow(0 8px 12px rgba(0,0,0,0.5))`;
+      boat.style.width = Math.round(200 * boatScale) + 'px';
+      boat.style.height = Math.round(70 * boatScale) + 'px';
+      boat.style.opacity = 0.75 + boatScale * 0.2;
       boat.style.zIndex = '10';
-      boat.style.opacity = 0.6 + boatScale * 0.3;
       boat.style.animationDuration = animDuration + 's';
 
+      const boatInner = document.createElement('div');
+      boatInner.style.cssText = 'width:100%;height:100%;background-size:contain;background-repeat:no-repeat;background-position:center bottom;';
+      boatInner.style.backgroundImage = `url("${BOAT_SVGS[svgIdx]}")`;
+
+      boat.appendChild(boatInner);
       bgAnimLayer.appendChild(boat);
-      setTimeout(() => { if (boat.parentNode) boat.remove(); }, (animDuration + 3) * 1000);
+      setTimeout(() => { if (boat.parentNode) boat.remove(); }, (animDuration + 4) * 1000);
     }
 
     spawnBoat();
@@ -833,18 +887,50 @@ function showTrackChangeBurst(track) {
       setTimeout(() => { if (drop.parentNode) drop.remove(); }, duration * 1000 + 100);
     }, 15);
 
-    // Облака (больше и чаще)
+    // SVG облака — 3 варианта
+    const CLOUD_SVGS = [
+      `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 120'><ellipse cx='100' cy='75' rx='95' ry='45' fill='white' opacity='0.85'/><ellipse cx='180' cy='80' rx='80' ry='38' fill='white' opacity='0.8'/><ellipse cx='90' cy='60' rx='55' ry='40' fill='white' opacity='0.9'/><ellipse cx='160' cy='55' rx='65' ry='45' fill='white' opacity='0.9'/><ellipse cx='220' cy='65' rx='50' ry='35' fill='white' opacity='0.85'/></svg>`,
+      `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 100'><ellipse cx='140' cy='65' rx='120' ry='35' fill='white' opacity='0.8'/><ellipse cx='80' cy='55' rx='60' ry='38' fill='white' opacity='0.85'/><ellipse cx='190' cy='52' rx='70' ry='42' fill='white' opacity='0.85'/><ellipse cx='130' cy='45' rx='55' ry='35' fill='white' opacity='0.9'/></svg>`,
+      `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><ellipse cx='120' cy='60' rx='105' ry='30' fill='rgba(220,230,255,0.9)'/><ellipse cx='70' cy='50' rx='55' ry='35' fill='rgba(220,230,255,0.85)'/><ellipse cx='165' cy='48' rx='60' ry='38' fill='white' opacity='0.9'/><ellipse cx='120' cy='40' rx='50' ry='30' fill='white' opacity='0.95'/></svg>`
+    ];
+
+    // Спавним первые 3 облака сразу
+    for (let ci = 0; ci < 3; ci++) {
+      setTimeout(() => {
+        if (!bgAnimActive) return;
+        const cloud = document.createElement('div');
+        cloud.className = 'gen-element gen-cloud';
+        const svgIdx = Math.floor(Math.random() * CLOUD_SVGS.length);
+        cloud.style.backgroundImage = `url("${CLOUD_SVGS[svgIdx]}")`;
+        cloud.style.top = (5 + Math.random() * 35) + 'vh';
+        cloud.style.left = (ci * 30 + Math.random() * 20) + 'vw'; // распределяем по экрану
+        const cScale = 0.6 + Math.random() * 0.9;
+        cloud.style.width = Math.round(280 * cScale) + 'px';
+        cloud.style.height = Math.round(120 * cScale) + 'px';
+        cloud.style.opacity = 0.7 + Math.random() * 0.25;
+        const dur = 50 + Math.random() * 20;
+        cloud.style.animationDuration = dur + 's';
+        bgAnimLayer.appendChild(cloud);
+        setTimeout(() => { if (cloud.parentNode) cloud.remove(); }, (dur + 3) * 1000);
+      }, ci * 3000);
+    }
+
     const cloudInterval = setInterval(() => {
-      if (document.hidden) return;
+      if (!bgAnimActive || document.hidden) return; // ВАЖНО: bgAnimActive guard
       const cloud = document.createElement('div');
       cloud.className = 'gen-element gen-cloud';
-      cloud.style.backgroundImage = 'url("assets/images/cloud_element.png")';
-      cloud.style.top = (-5 + Math.random() * 30) + 'vh'; // весь верх неба
-      const scale = 0.5 + Math.random() * 1.5;
-      cloud.style.transform = `scale(${scale})`;
+      const svgIdx = Math.floor(Math.random() * CLOUD_SVGS.length);
+      cloud.style.backgroundImage = `url("${CLOUD_SVGS[svgIdx]}")`;
+      cloud.style.top = (5 + Math.random() * 35) + 'vh';
+      const cScale = 0.6 + Math.random() * 0.9;
+      cloud.style.width = Math.round(280 * cScale) + 'px';
+      cloud.style.height = Math.round(120 * cScale) + 'px';
+      cloud.style.opacity = 0.7 + Math.random() * 0.25;
+      const dur = 50 + Math.random() * 20;
+      cloud.style.animationDuration = dur + 's';
       bgAnimLayer.appendChild(cloud);
-      setTimeout(() => { if (cloud.parentNode) cloud.remove(); }, 56000);
-    }, 4000 + Math.random() * 5000); // Спавн очень частый
+      setTimeout(() => { if (cloud.parentNode) cloud.remove(); }, (dur + 3) * 1000);
+    }, 10000 + Math.random() * 8000);
     genElementIntervals.push(cloudInterval);
   }
 

@@ -368,29 +368,37 @@ input[type=range]::-webkit-slider-runnable-track {
   100% { transform: translate(110vw, -10vh) scale(0.8); opacity: 0; }
 }
 
-/* === СГЕНЕРИРОВАННЫЕ ЭЛЕМЕНТЫ (PNG) === */
+/* === СГЕНЕРИРОВАННЫЕ ЭЛЕМЕНТЫ (SVG) === */
+/* Анимация двигает только позицию — scaleX теперь на inner-элементе */
 @keyframes gen-surfer-ride {
   0%   { transform: translate(-15vw,  0px)    rotate(-3deg); opacity: 0; }
   5%   { opacity: 1; }
-  10%  { transform: translate(5vw,  -18px)   rotate(4deg);  }
+  10%  { transform: translate(5vw,  -16px)   rotate(4deg);  }
   18%  { transform: translate(13vw,  10px)   rotate(-5deg); }
-  26%  { transform: translate(21vw, -22px)   rotate(5deg);  }
+  26%  { transform: translate(21vw, -20px)   rotate(5deg);  }
   34%  { transform: translate(30vw,  12px)   rotate(-4deg); }
-  42%  { transform: translate(40vw, -20px)   rotate(6deg);  }
+  42%  { transform: translate(40vw, -18px)   rotate(6deg);  }
   50%  { transform: translate(50vw,  14px)   rotate(-5deg); }
-  58%  { transform: translate(60vw, -18px)   rotate(4deg);  }
+  58%  { transform: translate(60vw, -16px)   rotate(4deg);  }
   66%  { transform: translate(68vw,  10px)   rotate(-3deg); }
-  74%  { transform: translate(76vw, -16px)   rotate(5deg);  }
+  74%  { transform: translate(76vw, -14px)   rotate(5deg);  }
   82%  { transform: translate(84vw,   8px)   rotate(-4deg); }
-  90%  { opacity: 1; transform: translate(92vw, -12px)   rotate(8deg);  }
-  95%  { opacity: 0.5; transform: translate(100vw,  20px)  rotate(40deg); }
-  100% { opacity: 0; transform: translate(112vw,  40px)  rotate(90deg); }
+  90%  { opacity: 1; transform: translate(92vw, -10px)  rotate(8deg);  }
+  95%  { opacity: 0.4; transform: translate(100vw, 18px) rotate(40deg); }
+  100% { opacity: 0; transform: translate(112vw, 36px) rotate(90deg); }
 }
 
 @keyframes surfer-wake {
   0%   { box-shadow: 0 6px 12px rgba(255,255,255,0.0); }
   50%  { box-shadow: 0 6px 20px rgba(255,255,255,0.4), 0 10px 30px rgba(100,200,255,0.3); }
   100% { box-shadow: 0 6px 12px rgba(255,255,255,0.0); }
+}
+
+@keyframes foam-drift {
+  0%   { transform: scaleX(0.3) translateX(0);   opacity: 0; }
+  20%  { opacity: 0.8; transform: scaleX(1) translateX(10px); }
+  70%  { opacity: 0.5; transform: scaleX(1.4) translateX(25px); }
+  100% { opacity: 0;   transform: scaleX(0.8) translateX(40px); }
 }
 
 @keyframes gen-boat-float {
@@ -427,18 +435,27 @@ input[type=range]::-webkit-slider-runnable-track {
   background-position: center;
 }
 .gen-surfer {
-  width: 130px;
-  height: 130px;
+  width: 120px;
+  height: 120px;
   bottom: 25vh;
-  transform: scaleX(-1);
-  animation: gen-surfer-ride 22s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards,
-             surfer-wake 2s ease-in-out infinite;
-  filter: drop-shadow(0 4px 8px rgba(0,150,255,0.4));
+  /* НЕТ transform здесь — анимация управляет transform */
+  animation: gen-surfer-ride 22s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
 }
+
+/* Inner wrapper — здесь scaleX и фоновая картинка */
+.surfer-inner {
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+}
+
 .gen-boat {
   width: 220px;
   height: 120px;
-  bottom: 8vh;
+  bottom: 3vh;
   animation: gen-boat-float 48s linear forwards;
   filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5)) drop-shadow(0 2px 6px rgba(100,180,255,0.3));
 }
