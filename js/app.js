@@ -734,27 +734,30 @@ function showTrackChangeBurst(track) {
   function startWeligamaSurfers() {
     stopBgAnimation();
     if (!bgAnimLayer) return;
-    const interval = setInterval(() => {
-      if (document.hidden) return;
+
+    function spawnSurfersWave() {
+      if (currentBgIndex !== 1 || document.hidden) return;
       // Спавним от 1 до 3 сёрферов одновременно
       const count = Math.floor(Math.random() * 3) + 1;
       for (let i = 0; i < count; i++) {
         setTimeout(() => {
+          if (currentBgIndex !== 1) return;
           const surfer = document.createElement('div');
           surfer.className = 'gen-element gen-surfer';
           surfer.style.backgroundImage = 'url("assets/images/surfer_element.png")';
           surfer.style.bottom = (15 + Math.random() * 25) + 'vh';
           // Разные цвета плавок и досок для "разных" сёрферов
           const hue = Math.floor(Math.random() * 360);
-          const flip = Math.random() > 0.8 ? 'scaleX(-1)' : ''; // иногда плывут в другую сторону
           surfer.style.filter = `hue-rotate(${hue}deg)`;
-          surfer.style.transform = flip;
           
           bgAnimLayer.appendChild(surfer);
           setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 21000);
         }, i * (800 + Math.random() * 1500));
       }
-    }, 4000 + Math.random() * 4000); // Спавн гораздо чаще!
+    }
+
+    spawnSurfersWave();
+    const interval = setInterval(spawnSurfersWave, 4000 + Math.random() * 4000); // Спавн гораздо чаще!
     genElementIntervals.push(interval);
   }
 
@@ -762,19 +765,24 @@ function showTrackChangeBurst(track) {
   function startNoviSadBoats() {
     stopBgAnimation();
     if (!bgAnimLayer) return;
-    const interval = setInterval(() => {
-      if (document.hidden) return;
+
+    function spawnBoat() {
+      if (currentBgIndex !== 3 || document.hidden) return;
       const boat = document.createElement('div');
       boat.className = 'gen-element gen-boat';
       boat.style.backgroundImage = 'url("assets/images/boat_element.png")';
-      boat.style.bottom = (5 + Math.random() * 12) + 'vh'; 
+      boat.style.bottom = (20 + Math.random() * 15) + 'vh'; 
       // Разные оттенки лодок
       const hue = Math.floor(Math.random() * 40) - 20;
       boat.style.filter = `hue-rotate(${hue}deg)`;
+      boat.style.zIndex = '10';
       
       bgAnimLayer.appendChild(boat);
       setTimeout(() => { if (boat.parentNode) boat.remove(); }, 46000);
-    }, 5000 + Math.random() * 5000); // Спавн очень частый
+    }
+
+    spawnBoat();
+    const interval = setInterval(spawnBoat, 5000 + Math.random() * 5000); // Спавн очень частый
     genElementIntervals.push(interval);
   }
 
