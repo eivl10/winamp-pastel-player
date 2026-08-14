@@ -764,6 +764,23 @@ function showTrackChangeBurst(track) {
     genElementIntervals.push(foamInterval);
     spawnFoam();
 
+    // Живой океан: волновой SVG-оверлей
+    const waveOverlay = document.createElement('div');
+    waveOverlay.id = 'wave-overlay';
+    waveOverlay.style.cssText = `
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 55vh;
+      pointer-events: none;
+      z-index: 2;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'><path fill='rgba(0,140,200,0.12)' d='M0,160 C360,280 720,40 1080,160 C1260,220 1350,200 1440,160 L1440,320 L0,320 Z'/><path fill='rgba(0,160,220,0.08)' d='M0,200 C300,120 600,280 900,200 C1100,140 1280,240 1440,200 L1440,320 L0,320 Z'/></svg>") repeat-x bottom;
+      background-size: 50% 100%;
+      animation: wave-scroll 8s linear infinite;
+    `;
+    bgAnimLayer.appendChild(waveOverlay);
+
     function spawnSurfersWave() {
       if (currentBgIndex !== 1 || document.hidden) return;
       // Спавним от 1 до 3 сёрферов одновременно
@@ -784,7 +801,7 @@ function showTrackChangeBurst(track) {
 
           const scale = 0.7 + Math.random() * 0.6;
           const depthOpacity = 0.6 + scale * 0.3;
-          const bottomPos = 18 + Math.random() * 20;
+          const bottomPos = 30 + Math.random() * 18; // vh — зона волн Велигамы
           const animDuration = 20 + Math.floor(Math.random() * 8);
           const svgIdx = Math.floor(Math.random() * SURFER_SVGS.length);
 
@@ -801,6 +818,56 @@ function showTrackChangeBurst(track) {
           inner.style.backgroundImage = `url("${SURFER_SVGS[svgIdx]}")`;
 
           surfer.appendChild(inner);
+
+          // Интерактив: клик/тап — выбиваем сёрфера с доски
+          let surferHit = false;
+          function wipeoutSurfer(e) {
+            if (surferHit) return;
+            surferHit = true;
+            e.stopPropagation();
+            // Захватываем текущую позицию
+            const currentTransform = window.getComputedStyle(surfer).transform;
+            surfer.style.animation = 'none';
+            surfer.style.transform = currentTransform;
+            // Разворачиваем inner обратно для показа фигуры прямо
+            // Wipeout: фигура улетает вверх-вбок, доска отдельно уходит вниз
+            surfer.style.transition = 'transform 1.2s cubic-bezier(0.2,0,0.8,1), opacity 1s ease-in';
+            surfer.style.transform = currentTransform + ' translateY(-60px) rotate(-40deg) scale(0.5)';
+            surfer.style.opacity = '0';
+            // Брызги воды
+            const rect = surfer.getBoundingClientRect();
+            for (let s = 0; s < 12; s++) {
+              const splash = document.createElement('div');
+              const angle = (s / 12) * Math.PI * 2;
+              const dist = 20 + Math.random() * 50;
+              const tx = Math.cos(angle) * dist;
+              const ty = Math.sin(angle) * dist - 35;
+              splash.style.cssText = `
+                position: fixed;
+                left: ${rect.left + rect.width/2}px;
+                top: ${rect.top + rect.height*0.8}px;
+                width: ${3+Math.random()*7}px;
+                height: ${3+Math.random()*7}px;
+                background: rgba(150,220,255,0.9);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+              `;
+              document.body.appendChild(splash);
+              const dur = 500 + Math.random() * 700;
+              splash.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${tx}px,${ty}px) scale(0.2)`, opacity: 0 }
+              ], { duration: dur, easing: 'ease-out', fill: 'forwards' });
+              setTimeout(() => { if (splash.parentNode) splash.remove(); }, dur + 100);
+            }
+            setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, 1500);
+          }
+          surfer.style.pointerEvents = 'auto';
+          surfer.style.cursor = 'crosshair';
+          surfer.addEventListener('click', wipeoutSurfer);
+          surfer.addEventListener('touchstart', wipeoutSurfer, { passive: false });
+
           bgAnimLayer.appendChild(surfer);
           setTimeout(() => { if (surfer.parentNode) surfer.remove(); }, (animDuration + 4) * 1000);
         }, i * (800 + Math.random() * 1500));
@@ -831,7 +898,7 @@ function showTrackChangeBurst(track) {
       ];
 
       const boatScale = 0.55 + Math.random() * 0.6;
-      const boatBottom = 1 + Math.random() * 6; // ОЧЕНЬ низко — на реке
+      const boatBottom = 34 + Math.random() * 12; // vh — на реке Дунай
       const animDuration = 44 + Math.floor(Math.random() * 14);
       const svgIdx = Math.floor(Math.random() * BOAT_SVGS.length);
 
@@ -849,6 +916,50 @@ function showTrackChangeBurst(track) {
       boatInner.style.backgroundImage = `url("${BOAT_SVGS[svgIdx]}")`;
 
       boat.appendChild(boatInner);
+
+      // Интерактив: клик/тап — топим лодку
+      boat.style.pointerEvents = 'auto';
+      boat.style.cursor = 'pointer';
+      let boatSunk = false;
+      function sinkBoat(e) {
+        if (boatSunk) return;
+        boatSunk = true;
+        e.stopPropagation();
+        // Останавливаем анимацию движения
+        const currentTransform = window.getComputedStyle(boat).transform;
+        boat.style.animation = 'none';
+        boat.style.transform = currentTransform;
+        // Анимация потопления: лодка уходит вниз + вращается + пузыри
+        boat.style.transition = 'transform 1.8s cubic-bezier(0.4,0,1,1), opacity 1.5s ease-in';
+        boat.style.transform = currentTransform + ' translateY(80px) rotate(25deg) scaleY(0.3)';
+        boat.style.opacity = '0';
+        // Брызги
+        for (let b = 0; b < 8; b++) {
+          const splash = document.createElement('div');
+          const rect = boat.getBoundingClientRect();
+          const bx = rect.left + rect.width/2 + (Math.random()-0.5)*rect.width;
+          const by = rect.top + rect.height*0.7;
+          splash.style.cssText = `
+            position: fixed;
+            left: ${bx}px;
+            top: ${by}px;
+            width: ${4+Math.random()*8}px;
+            height: ${4+Math.random()*8}px;
+            background: rgba(100,180,255,0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: boat-splash-drop ${0.6+Math.random()*0.8}s ease-out forwards;
+            transform: translate(${(Math.random()-0.5)*60}px, 0);
+          `;
+          document.body.appendChild(splash);
+          setTimeout(() => { if (splash.parentNode) splash.remove(); }, 1500);
+        }
+        setTimeout(() => { if (boat.parentNode) boat.remove(); }, 2000);
+      }
+      boat.addEventListener('click', sinkBoat);
+      boat.addEventListener('touchstart', sinkBoat, { passive: false });
+
       bgAnimLayer.appendChild(boat);
       setTimeout(() => { if (boat.parentNode) boat.remove(); }, (animDuration + 4) * 1000);
     }
@@ -910,8 +1021,77 @@ function showTrackChangeBurst(track) {
         cloud.style.opacity = 0.7 + Math.random() * 0.25;
         const dur = 50 + Math.random() * 20;
         cloud.style.animationDuration = dur + 's';
+
+        // Интерактив: перетаскивание облака
+        cloud.style.pointerEvents = 'auto';
+        cloud.style.cursor = 'grab';
+        let isDraggingCloud = false;
+        let cloudDragStartX = 0, cloudDragStartY = 0;
+        let cloudOrigLeft = 0, cloudOrigTop = 0;
+
+        function startDragCloud(e) {
+          isDraggingCloud = true;
+          const cs = window.getComputedStyle(cloud);
+          const rect = cloud.getBoundingClientRect();
+          cloudOrigLeft = rect.left;
+          cloudOrigTop = rect.top;
+          cloud.style.animation = 'none';
+          cloud.style.position = 'fixed';
+          cloud.style.left = cloudOrigLeft + 'px';
+          cloud.style.top = cloudOrigTop + 'px';
+          cloud.style.bottom = 'auto';
+          cloud.style.transform = 'none';
+          cloud.style.cursor = 'grabbing';
+          cloud.style.zIndex = '999';
+          const point = e.touches ? e.touches[0] : e;
+          cloudDragStartX = point.clientX - cloudOrigLeft;
+          cloudDragStartY = point.clientY - cloudOrigTop;
+          e.preventDefault();
+        }
+
+        function moveDragCloud(e) {
+          if (!isDraggingCloud) return;
+          const point = e.touches ? e.touches[0] : e;
+          cloud.style.left = (point.clientX - cloudDragStartX) + 'px';
+          cloud.style.top  = (point.clientY - cloudDragStartY) + 'px';
+          e.preventDefault();
+        }
+
+        function cleanupCloudDrag() {
+          document.removeEventListener('mousemove', moveDragCloud);
+          document.removeEventListener('touchmove', moveDragCloud);
+          document.removeEventListener('mouseup', endDragCloud);
+          document.removeEventListener('touchend', endDragCloud);
+        }
+
+        function endDragCloud(e) {
+          if (!isDraggingCloud) return;
+          isDraggingCloud = false;
+          cloud.style.cursor = 'grab';
+          const curLeft = parseFloat(cloud.style.left) || 0;
+          const targetLeft = window.innerWidth + 200;
+          const remainDist = Math.max(targetLeft - curLeft, 100);
+          const remainTime = Math.max((remainDist / window.innerWidth) * 55000, 2000);
+          cloud.style.transition = `left ${remainTime}ms linear`;
+          cloud.style.left = targetLeft + 'px';
+          setTimeout(() => {
+            if (cloud.parentNode) cloud.remove();
+            cleanupCloudDrag();
+          }, remainTime + 200);
+        }
+
+        cloud.addEventListener('mousedown', startDragCloud);
+        cloud.addEventListener('touchstart', startDragCloud, { passive: false });
+        document.addEventListener('mousemove', moveDragCloud);
+        document.addEventListener('touchmove', moveDragCloud, { passive: false });
+        document.addEventListener('mouseup', endDragCloud);
+        document.addEventListener('touchend', endDragCloud);
+
         bgAnimLayer.appendChild(cloud);
-        setTimeout(() => { if (cloud.parentNode) cloud.remove(); }, (dur + 3) * 1000);
+        setTimeout(() => {
+          if (cloud.parentNode) cloud.remove();
+          cleanupCloudDrag();
+        }, (dur + 3) * 1000);
       }, ci * 3000);
     }
 
@@ -928,8 +1108,77 @@ function showTrackChangeBurst(track) {
       cloud.style.opacity = 0.7 + Math.random() * 0.25;
       const dur = 50 + Math.random() * 20;
       cloud.style.animationDuration = dur + 's';
+
+      // Интерактив: перетаскивание облака
+      cloud.style.pointerEvents = 'auto';
+      cloud.style.cursor = 'grab';
+      let isDraggingCloud = false;
+      let cloudDragStartX = 0, cloudDragStartY = 0;
+      let cloudOrigLeft = 0, cloudOrigTop = 0;
+
+      function startDragCloud(e) {
+        isDraggingCloud = true;
+        const cs = window.getComputedStyle(cloud);
+        const rect = cloud.getBoundingClientRect();
+        cloudOrigLeft = rect.left;
+        cloudOrigTop = rect.top;
+        cloud.style.animation = 'none';
+        cloud.style.position = 'fixed';
+        cloud.style.left = cloudOrigLeft + 'px';
+        cloud.style.top = cloudOrigTop + 'px';
+        cloud.style.bottom = 'auto';
+        cloud.style.transform = 'none';
+        cloud.style.cursor = 'grabbing';
+        cloud.style.zIndex = '999';
+        const point = e.touches ? e.touches[0] : e;
+        cloudDragStartX = point.clientX - cloudOrigLeft;
+        cloudDragStartY = point.clientY - cloudOrigTop;
+        e.preventDefault();
+      }
+
+      function moveDragCloud(e) {
+        if (!isDraggingCloud) return;
+        const point = e.touches ? e.touches[0] : e;
+        cloud.style.left = (point.clientX - cloudDragStartX) + 'px';
+        cloud.style.top  = (point.clientY - cloudDragStartY) + 'px';
+        e.preventDefault();
+      }
+
+      function cleanupCloudDrag() {
+        document.removeEventListener('mousemove', moveDragCloud);
+        document.removeEventListener('touchmove', moveDragCloud);
+        document.removeEventListener('mouseup', endDragCloud);
+        document.removeEventListener('touchend', endDragCloud);
+      }
+
+      function endDragCloud(e) {
+        if (!isDraggingCloud) return;
+        isDraggingCloud = false;
+        cloud.style.cursor = 'grab';
+        const curLeft = parseFloat(cloud.style.left) || 0;
+        const targetLeft = window.innerWidth + 200;
+        const remainDist = Math.max(targetLeft - curLeft, 100);
+        const remainTime = Math.max((remainDist / window.innerWidth) * 55000, 2000);
+        cloud.style.transition = `left ${remainTime}ms linear`;
+        cloud.style.left = targetLeft + 'px';
+        setTimeout(() => {
+          if (cloud.parentNode) cloud.remove();
+          cleanupCloudDrag();
+        }, remainTime + 200);
+      }
+
+      cloud.addEventListener('mousedown', startDragCloud);
+      cloud.addEventListener('touchstart', startDragCloud, { passive: false });
+      document.addEventListener('mousemove', moveDragCloud);
+      document.addEventListener('touchmove', moveDragCloud, { passive: false });
+      document.addEventListener('mouseup', endDragCloud);
+      document.addEventListener('touchend', endDragCloud);
+
       bgAnimLayer.appendChild(cloud);
-      setTimeout(() => { if (cloud.parentNode) cloud.remove(); }, (dur + 3) * 1000);
+      setTimeout(() => {
+        if (cloud.parentNode) cloud.remove();
+        cleanupCloudDrag();
+      }, (dur + 3) * 1000);
     }, 10000 + Math.random() * 8000);
     genElementIntervals.push(cloudInterval);
   }

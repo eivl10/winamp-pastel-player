@@ -371,21 +371,21 @@ input[type=range]::-webkit-slider-runnable-track {
 /* === СГЕНЕРИРОВАННЫЕ ЭЛЕМЕНТЫ (SVG) === */
 /* Анимация двигает только позицию — scaleX теперь на inner-элементе */
 @keyframes gen-surfer-ride {
-  0%   { transform: translate(-15vw,  0px)    rotate(-3deg); opacity: 0; }
+  0%   { transform: translate(-15vw,  0px)   rotate(-3deg); opacity: 0; }
   5%   { opacity: 1; }
-  10%  { transform: translate(5vw,  -16px)   rotate(4deg);  }
-  18%  { transform: translate(13vw,  10px)   rotate(-5deg); }
-  26%  { transform: translate(21vw, -20px)   rotate(5deg);  }
-  34%  { transform: translate(30vw,  12px)   rotate(-4deg); }
-  42%  { transform: translate(40vw, -18px)   rotate(6deg);  }
-  50%  { transform: translate(50vw,  14px)   rotate(-5deg); }
-  58%  { transform: translate(60vw, -16px)   rotate(4deg);  }
-  66%  { transform: translate(68vw,  10px)   rotate(-3deg); }
-  74%  { transform: translate(76vw, -14px)   rotate(5deg);  }
-  82%  { transform: translate(84vw,   8px)   rotate(-4deg); }
-  90%  { opacity: 1; transform: translate(92vw, -10px)  rotate(8deg);  }
-  95%  { opacity: 0.4; transform: translate(100vw, 18px) rotate(40deg); }
-  100% { opacity: 0; transform: translate(112vw, 36px) rotate(90deg); }
+  10%  { transform: translate(5vw,  -14px)  rotate(4deg);  }
+  18%  { transform: translate(15vw,  10px)  rotate(-5deg); }
+  26%  { transform: translate(26vw, -16px)  rotate(5deg);  }
+  34%  { transform: translate(37vw,  10px)  rotate(-4deg); }
+  42%  { transform: translate(47vw, -14px)  rotate(6deg);  }
+  50%  { transform: translate(56vw,  10px)  rotate(-5deg); }
+  60%  { transform: translate(64vw, -12px)  rotate(4deg);  }
+  70%  { transform: translate(70vw,  6px)   rotate(-2deg); }
+  /* Wipeout! Волна накрывает, не доезжая берега */
+  78%  { opacity: 1; transform: translate(72vw, -8px)  rotate(20deg);  }
+  85%  { opacity: 0.6; transform: translate(74vw, 30px) rotate(60deg);  }
+  92%  { opacity: 0.2; transform: translate(75vw, 60px) rotate(120deg); }
+  100% { opacity: 0;   transform: translate(76vw, 80px) rotate(160deg); }
 }
 
 @keyframes surfer-wake {
@@ -399,6 +399,22 @@ input[type=range]::-webkit-slider-runnable-track {
   20%  { opacity: 0.8; transform: scaleX(1) translateX(10px); }
   70%  { opacity: 0.5; transform: scaleX(1.4) translateX(25px); }
   100% { opacity: 0;   transform: scaleX(0.8) translateX(40px); }
+}
+
+@keyframes boat-splash-drop {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  40%  { transform: translateY(-30px) scale(0.8); opacity: 0.8; }
+  100% { transform: translateY(20px) scale(0.2); opacity: 0; }
+}
+
+@keyframes surfer-splash {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(30px, -40px) scale(0.2); opacity: 0; }
+}
+
+@keyframes wave-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 @keyframes gen-boat-float {
